@@ -1,5 +1,3 @@
-import requests
-
 RECENT_TRACKS_ENDPOINT = 'https://api.spotify.com/v1/me/player/recently-played'
 
 # To do:
