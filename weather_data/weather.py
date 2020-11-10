@@ -3,8 +3,8 @@ from flask import Flask, request, jsonify, redirect
 
 def get_current_weather_json():
     CLIENT_IP = request.remote_addr
-    GEO_KEY = "Api Key Goes Here"
-    WEATHER_KEY = 'Api Key Goes Here'
+    GEO_KEY = os.environ['GEO_API_KEY']
+    WEATHER_KEY = os.environ['WEATHER_API_KEY']
     CURRENT_GEO_ENDPOINT = 'https://api.ipgeolocation.io/ipgeo?apiKey={0}&ip={1}&fields=geo'.format(GEO_KEY,CLIENT_IP)    
     r = requests.get(CURRENT_GEO_ENDPOINT)
     thedict=r.json()
