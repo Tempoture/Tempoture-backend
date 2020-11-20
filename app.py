@@ -14,17 +14,15 @@ cur = connection.cursor()
 
 app = Flask(__name__)
 
-@app.route('/')
-def main():
+def weather_json():
     data = weather.get_current_weather()
-    print(data)
-    return "Hello World!"
+    return data
 
-@app.route('/wip')
-def get_user_data():
-    # @todo: add authorization to GET request
-    # data = spotify.get_recent_tracks(url, auth_header)
-    return "This a work in progress!"
+@app.route('/', methods=['GET'])
+def spotify_user_songs():
+    access_token = request.args.get('access_token')
+    data = spotify.get_recent_tracks(access_token)
+    return data
 
 if __name__ == '__main__':
     app.run(use_reloader=True, debug=True)
