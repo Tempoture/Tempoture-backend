@@ -1,5 +1,6 @@
 import requests
 import xmltodict
+import os
 from flask import Flask, request, jsonify, redirect
 
 # API KEYS
