@@ -3,6 +3,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.sql import text
 import random
 import string
+import os
 
 #------------------------------ below are the select queries for the tempoture database ------------------------------#
 
