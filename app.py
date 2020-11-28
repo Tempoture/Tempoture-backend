@@ -5,7 +5,7 @@ from weather_data import weather
 
 app = Flask(__name__)
 
-@app.route('/', methods=['GET'])
+@app.route('/api', methods=['GET'])
 def api():
     return {
         'userID': 1,
