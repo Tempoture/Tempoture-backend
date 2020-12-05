@@ -1,11 +1,9 @@
 <!--[![GPL License][license-shield]][license-url] -->
-Tempoture is an application designed to link users to a playlist based on the current weather in their area.
-The main goal is to be able to correlate user listening habits to the change in weather through the use of a machine learning model.
 
 <br />
 <p align="center">
   <a href="https://github.com/Tempoture/Tempoture-backend">
-     <img src="https://cdn.discordapp.com/attachments/750506956539822120/769965690420723722/LOGO.PNG" alt="Logo" width="350" height="350">
+     <img src="https://cdn.discordapp.com/attachments/750506956539822120/769965690420723722/LOGO.PNG" alt="Logo" width="500" height="500">
   </a> 
    <h3 align="center">Backend and Database for the Tempoture Project</h3>
 
@@ -15,10 +13,13 @@ The main goal is to be able to correlate user listening habits to the change in 
     <a href="https://github.com/Tempoture/Tempoture-frontend">Frontend Repository</a>
     ·
     <a href="https://github.com/Tempoture/Tempoture-backend">Backend and Database Repository</a>
-    .
+    ·
     <a href="https://github.com/Tempoture/Tempoture-Data-Base">Testing Repository</a>
   </p>
 </p>
+
+Tempoture is an application designed to link users to a playlist based on the current weather in their area.
+The main goal is to be able to correlate user listening habits to the change in weather through the use of a machine learning model.
 
 <!-- TABLE OF CONTENTS -->
 ## Table of Contents
@@ -41,8 +42,6 @@ The main goal is to be able to correlate user listening habits to the change in 
 # Backend
 <!-- ABOUT THE Backend -->
 ## About The Backend
-This portion of the repository was made for the backend. 
-![Tempoture Logo](https://cdn.discordapp.com/attachments/750506956539822120/769965690420723722/LOGO.PNG "Tempoture Logo")
 
 ## API Reference
 
@@ -105,9 +104,9 @@ Before installing the following softwares, have the latest version of Python ins
   
 <!-- Useful Resources -->
 ## Useful Resources
-  ### Backend
+  ### Backend Resources
   
-  ### Database
+  ### Database Resources
   * [MySQL in 25 Minutes](https://www.youtube.com/watch?v=8kDs8QkFI2Y&list=PLB-7_zmcEzQyjWl5g8KBnd3dKRvmRlSYA&index=11)
   * [How to Design a Database](https://www.youtube.com/watch?v=cepspxPAUTA&list=PLB-7_zmcEzQyjWl5g8KBnd3dKRvmRlSYA&index=1)
   * [Logical Database Design](https://www.youtube.com/watch?v=ZBgXb66Ckz0&list=PLB-7_zmcEzQyjWl5g8KBnd3dKRvmRlSYA&index=15)
