@@ -42,10 +42,7 @@ The main goal is to be able to correlate user listening habits to the change in 
 # Backend
 <!-- ABOUT THE Backend -->
 ## About The Backend
-
-## API Reference
-
-The Tempoture backend will make use of three APIs:
+An API specifies what kind of interactions a user can have with a software. The Tempoture backend will make use of three APIs:
 
 1. [IP Geo Location](https://ipgeolocation.io/ "IP Geo Location")
 
@@ -54,9 +51,15 @@ The Tempoture backend will make use of three APIs:
 3. [Spotify - User Recently Played Songs](https://developer.spotify.com/documentation/web-api/reference/player/get-recently-played/ "Spotify - User Recently Played Songs")
 
 ## Backend Software
-
+  * [Flask](https://flask.palletsprojects.com/en/1.1.x/) - The Python framework used for its backend tools.
+  * [Python3](https://www.python.org/download/releases/3.0/) - The programming language of choice for the project. 
 ## Backend Installation Guide
-
+Before installing the following softwares, have the latest version of Python installed. Also note that these install commands are specific for the Ubuntu bash terminal. 
+### Flask
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$sudo apt update` - Ensures Ubuntu is up to date.
+   <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$sudo apt install python3-pip` - Install package management system.
+   <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$pip install Flask` - Install for Flask.
+    
 # Database
 <!-- ABOUT THE Database -->
 ## About The Database
@@ -73,14 +76,14 @@ Above is a physical representation of the database that is used for the Tempotur
   
 <!-- Software -->
 ### Database Software  
-  <!--turn into link-->
+  <!--turns into link-->
   * [Vertabelo](https://vertabelo.com/) - An application used for designing database schema.
   * [PGAdmin](https://www.pgadmin.org/) - A software used for database maintenance and running queries. 
   * [Psycopg2](https://pypi.org/project/psycopg2/) - A software used with python to establish connections with databases.  
   * [PostgreSQL](https://www.postgresql.org/) - An open source object-relational database system that uses and extends the SQL language.
   * [Python3](https://www.python.org/download/releases/3.0/) - The programming language of choice for the project. 
   * [SQLAlchemy](https://www.sqlalchemy.org/) - The software used in conjunction with Psycopg2 to query the database.
-  
+  * [Flask](https://flask.palletsprojects.com/en/1.1.x/) - The Python framework used for its backend tools.
 <!-- Installation -->
 ## Database Installation Guide
 Before installing the following softwares, have the latest version of Python installed. Also note that these install commands are specific for the Ubuntu bash terminal. 
