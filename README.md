@@ -22,21 +22,24 @@ The main goal is to be able to correlate user listening habits to the change in 
 ## Table of Contents
 
 * [About the Backend](#About-The-Backend)
-  * [Software](#BackendSoftware)
+  * [Software](#Backend-Software)
   * [Installation Guide](#Backend-Installation-Guide)
 * [About the Database](#About-The-Database)
-  * [Software](#DatabaseSoftware)
+  * [Software](#Database-Software)
   * [Installation Guide](#Database-Installation-Guide)
     * [Flask](#Flask)
     * [Psycopg2](#Psycopg2)
     * [PostgreSQL](#PostgreSQL)
     * [SQLAlchemy](#SQLAlchemy)
-* [License](#License)
+
 * [Useful Resources](#Useful-Resources)
   * [Backend](#Backend-Resources)
   * [Database](#Database-Resources)
-# Backend
+* [License](#License)
 
+# Backend
+<!-- ABOUT THE Backend -->
+## About The Backend
 This portion of the repository was made for the backend. 
 ![Tempoture Logo](https://cdn.discordapp.com/attachments/750506956539822120/769965690420723722/LOGO.PNG "Tempoture Logo")
 
@@ -49,6 +52,8 @@ The Tempoture backend will make use of three APIs:
 2. [OpenWeather](https://openweathermap.org/api " OpenWeather")
 
 3. [Spotify - User Recently Played Songs](https://developer.spotify.com/documentation/web-api/reference/player/get-recently-played/ "Spotify - User Recently Played Songs")
+
+## Backend Installation Guide
 
 # Database
 <!-- ABOUT THE Database -->
@@ -65,9 +70,7 @@ Above is a physical representation of the database that is used for the Tempotur
   
   
 <!-- Software -->
-### Software
-  <!-- fill this in -->
-  
+### Database Software  
   <!--turn into link-->
   * [Vertabelo](https://vertabelo.com/) - An application used for designing database schema.
   * [PGAdmin](https://www.pgadmin.org/) - A software used for database maintenance and running queries. 
@@ -77,7 +80,7 @@ Above is a physical representation of the database that is used for the Tempotur
   * [SQLAlchemy](https://www.sqlalchemy.org/) - The software used in conjunction with Psycopg2 to query the database.
   
 <!-- Installation -->
-## Installation Guide
+## Database Installation Guide
 Before installing the following softwares, have the latest version of Python installed. Also note that these install commands are specific for the Ubuntu bash terminal. 
   ### Flask
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$sudo apt update` - Ensures Ubuntu is up to date.
@@ -99,16 +102,19 @@ Before installing the following softwares, have the latest version of Python ins
   
 <!-- Useful Resources -->
 ## Useful Resources
-* [MySQL in 25 Minutes](https://www.youtube.com/watch?v=8kDs8QkFI2Y&list=PLB-7_zmcEzQyjWl5g8KBnd3dKRvmRlSYA&index=11)
-* [How to Design a Database](https://www.youtube.com/watch?v=cepspxPAUTA&list=PLB-7_zmcEzQyjWl5g8KBnd3dKRvmRlSYA&index=1)
-* [Logical Database Design](https://www.youtube.com/watch?v=ZBgXb66Ckz0&list=PLB-7_zmcEzQyjWl5g8KBnd3dKRvmRlSYA&index=15)
-* [Database Design Course](https://www.youtube.com/watch?v=ztHopE5Wnpc)
-* [Intro to PostgreSQL with PgAdmin](https://www.youtube.com/watch?v=Dd2ej-QKrWY)
-* [AES Explained (Advanced Encryption Standard)](https://www.youtube.com/watch?v=O4xNJsjtN6E)
+  ### Backend
+  
+  ### Database
+  * [MySQL in 25 Minutes](https://www.youtube.com/watch?v=8kDs8QkFI2Y&list=PLB-7_zmcEzQyjWl5g8KBnd3dKRvmRlSYA&index=11)
+  * [How to Design a Database](https://www.youtube.com/watch?v=cepspxPAUTA&list=PLB-7_zmcEzQyjWl5g8KBnd3dKRvmRlSYA&index=1)
+  * [Logical Database Design](https://www.youtube.com/watch?v=ZBgXb66Ckz0&list=PLB-7_zmcEzQyjWl5g8KBnd3dKRvmRlSYA&index=15)
+  * [Database Design Course](https://www.youtube.com/watch?v=ztHopE5Wnpc)
+  * [Intro to PostgreSQL with PgAdmin](https://www.youtube.com/watch?v=Dd2ej-QKrWY)
+  * [AES Explained (Advanced Encryption Standard)](https://www.youtube.com/watch?v=O4xNJsjtN6E)
   
 <!-- License -->
 # License
-  Distributed under the GPL License. See `LICENSE` for more information.
+  * [License](https://github.com/Tempoture/Tempoture-backend/blob/main/LICENSE) - Distributed under the GPL License. Click for more information.
 <!-- links -->
 [license-shield]: https://cdn.discordapp.com/attachments/750506956539822120/771468904899543090/gpl_license.PNG
 [license-url]: https://github.com/Tempoture/Tempoture-Data-Base/blob/main/LICENSE
