@@ -59,6 +59,27 @@ def Select_Daily_Forecasts_Query(city_id):
 
     return query_result
 
+def Select_Daily_Forecasts_Query(city_id):
+
+    engine = create_engine(os.environ['DB_URI'])
+
+    with engine.connect() as connection:
+        select_query = """SELECT * FROM "daily_forecasts" WHERE city_id =:input;""" 
+        query_result = connection.execute(text(select_query), input = city_id ).fetchone()
+
+    return query_result
+
+def Select_User_Playlists_Query(user_id):
+
+    engine = create_engine(os.environ['DB_URI'])
+
+    with engine.connect() as connection:
+        select_query = """SELECT * FROM "playlists" WHERE user_id =:input;""" 
+        query_result = connection.execute(text(select_query), input = user_id ).fetchall()
+
+    return query_result
+
+
 #------------------------------ below are the insert queries for the tempoture database ------------------------------#
 #---Temporary password Generator for User---#
 def get_random_string(length):
