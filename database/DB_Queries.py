@@ -59,15 +59,6 @@ def Select_Daily_Forecasts_Query(city_id):
 
     return query_result
 
-def Select_Daily_Forecasts_Query(city_id):
-
-    engine = create_engine(os.environ['DB_URI'])
-
-    with engine.connect() as connection:
-        select_query = """SELECT * FROM "daily_forecasts" WHERE city_id =:input;""" 
-        query_result = connection.execute(text(select_query), input = city_id ).fetchone()
-
-    return query_result
 
 def Select_User_Playlists_Query(user_id):
 
