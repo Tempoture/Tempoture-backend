@@ -2,13 +2,19 @@ import requests
 import xmltodict
 import os
 from flask import Flask, request, jsonify, redirect
+from dotenv import load_dotenv
 
-# API KEYS
+GEO_KEY = ""
+WEATHER_KEY = ""
+
 try: 
     GEO_KEY = os.environ['GEO_API_KEY']
     WEATHER_KEY = os.environ['WEATHER_API_KEY']
 except Exception: 
-    print("No API Key Supplied")
+    load_dotenv()
+    
+    GEO_KEY = os.getenv('GEO_API_KEY')
+    WEATHER_KEY = os.getenv('WEATHER_API_KEY')
 
 
 # Return user's zip code
