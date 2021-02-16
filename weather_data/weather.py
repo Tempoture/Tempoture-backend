@@ -4,8 +4,12 @@ import os
 from flask import Flask, request, jsonify, redirect
 
 # API KEYS
-GEO_KEY = os.environ['GEO_API_KEY']
-WEATHER_KEY = os.environ['WEATHER_API_KEY']
+try: 
+    GEO_KEY = os.environ['GEO_API_KEY']
+    WEATHER_KEY = os.environ['WEATHER_API_KEY']
+except Exception: 
+    print("No API Key Supplied")
+
 
 # Return user's zip code
 def get_zip_code():
