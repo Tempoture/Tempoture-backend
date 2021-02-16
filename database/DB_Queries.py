@@ -59,15 +59,6 @@ def Select_Daily_Forecasts_Query(city_id):
 
     return query_result
 
-def Select_Daily_Forecasts_Query(city_id):
-
-    engine = create_engine(os.environ['DB_URI'])
-
-    with engine.connect() as connection:
-        select_query = """SELECT * FROM "daily_forecasts" WHERE city_id =:input;""" 
-        query_result = connection.execute(text(select_query), input = city_id ).fetchone()
-
-    return query_result
 
 def Select_User_Playlists_Query(user_id):
 
@@ -108,21 +99,6 @@ def Insert_User_Query(email, spotify_id, date, time, city_id):
         connection.execute(text(insert_query),  input_1 = email, input_2 = cipher_text, input_3 = spotify_id    , 
                                                 input_4 = date, input_5 = time , input_6 = city_id )
         
-#---This will be for after we have implemented User logins---#        
-"""
-def Insert_User_Query(email, password, spotify_id, date, time, city_id):
-
-    engine = create_engine(os.environ['DB_URI'])
-    cipher_text = _encrypt(password, CRYPTO_KEY, CRYPTO_IV)
-
-    with engine.connect() as connection:
-        connection.autocommit = True
-
-        insert_query =  ""INSERT INTO "users"(user_id, email, password, spotify_id, date_created, time_updated, city_id) 
-                            VALUES (DEFAULT, :input_1, :input_2, :input_3, :input_4, :input_5, :input_6);"" 
-        connection.execute(text(insert_query),  input_1 = email, input_2 = cipher_text, input_3 = spotify_id    , 
-                                                input_4 = date, input_5 = time , input_6 = city_id )
-"""
 def Insert_Cities_Query(city_name, state_id):
 
     engine = create_engine(os.environ['DB_URI'])
