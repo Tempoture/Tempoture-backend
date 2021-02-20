@@ -1,9 +1,11 @@
 import requests
 from flask import Flask, request, jsonify, redirect
+from flask_cors import CORS, cross_origin
 from spotify_data import spotify
 from weather_data import weather
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/api', methods=['GET'])
 def api():
@@ -12,6 +14,20 @@ def api():
         'title': 'Flask and React Application.',
         'completed': False
     }
+
+#Route Testing Data transfer from front end to Back end
+@app.route('/data', methods = ['POST'])
+def data():
+
+    data_json = request.get_json()
+
+    if not data_json:
+        return "Json Request Failed" #data not found/error 404 etc
+
+    data = data_json.get('authKey')
+
+    return data #Show data on screen
+    
 
 @app.route('/songs', methods=['GET'])
 def spotify_user_songs():
