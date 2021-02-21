@@ -42,15 +42,15 @@ def spotify_user_playlists():
     data = spotify.get_current_user_playlists(access_token)
     return data
 
-'''
-Related Playlist
-'''
-@app.route('/relatedplaylist', methods=['GET'])
-def spotify_user_playlists():
-    access_token = request.args.get('access_token')
-    data = spotify.get_current_user_playlists(access_token)
-    return data
-    
+# '''
+# Related Playlist
+# '''
+# @app.route('/relatedplaylist', methods=['GET'])
+# def spotify_user_playlists():
+#     access_token = request.args.get('access_token')
+#     data = spotify.get_current_user_playlists(access_token)
+#     return data
+
 @app.route('/weather')
 def get_weather():
     zipcode = weather.get_zip_code()
