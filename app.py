@@ -17,6 +17,7 @@ def api():
 
 #Route Testing Data transfer from front end to Back end
 @app.route('/data', methods = ['POST'])
+@cross_origin()
 def data():
 
     data_json = request.get_json()
