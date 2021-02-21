@@ -15,6 +15,14 @@ def api():
         'completed': False
     }
 
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'POST')
+    
+    return response
+
 #Route Testing Data transfer from front end to Back end
 @app.route('/data', methods = ['POST'])
 @cross_origin()
