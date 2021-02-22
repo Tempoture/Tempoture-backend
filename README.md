@@ -3,7 +3,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/Tempoture/Tempoture-backend">
-     <img src="https://cdn.discordapp.com/attachments/750506956539822120/769965690420723722/LOGO.PNG" alt="Logo" width="500" height="500">
+     <img src="https://cdn.discordapp.com/attachments/802184460031361024/813234383652651058/Tempo-Logo-text.png" alt="Logo" width="500" height="500">
   </a> 
    <h3 align="center">Backend and Database for the Tempoture Project</h3>
 
