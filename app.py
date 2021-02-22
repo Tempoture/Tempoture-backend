@@ -1,8 +1,9 @@
-import requests
 from flask import Flask, request, jsonify, redirect
 from flask_cors import CORS, cross_origin
 from spotify_data import spotify
 from weather_data import weather
+import json
+import requests
 
 app = Flask(__name__)
 CORS(app)
@@ -14,28 +15,35 @@ def api():
         'title': 'Flask and React Application.',
         'completed': False
     }
-
-@app.after_request
-def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'POST')
-    
-    return response
-
 #Route Testing Data transfer from front end to Back end
-@app.route('/data', methods = ['POST'])
-@cross_origin()
+@app.route('/data', methods = ['POST','GET'])
 def data():
 
-    data_json = request.get_json()
+    if 'zipcode' not in request.form or 'authKey' not in request.form :
+        response = app.response_class(
+            response=json.dumps({'success':False}),
+            status=404,
+            mimetype='application/json'
+        )
+        return response
+    
+    zipcode = request.form['zipcode']
+    authKey = request.form['authKey']
 
-    if not data_json:
-        return "Json Request Failed" #data not found/error 404 etc
+    responseD = {
+        'zipcode' : zipcode,
+        'authKey' : authKey
+    }
 
-    data = data_json.get('authKey')
+    response = app.response_class(
+        response=json.dumps(responseD),
+        status=200,
+        mimetype='application/json'
+    )
+    response.headers.add('Access-Control-Allow-Origin', '*')
 
-    return data #Show data on screen
+    return response
+    
     
 
 @app.route('/songs', methods=['GET'])
