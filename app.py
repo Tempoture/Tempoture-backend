@@ -41,7 +41,6 @@ def data():
         mimetype='application/json'
     )
     response.headers.add('Access-Control-Allow-Origin', '*')
-
     return response
     
     
@@ -80,18 +79,6 @@ def get_weather():
     cloudiness = weather.get_cloudiness(data)
     precipitation = weather.get_precipitation(data)
     last_updated = weather.get_last_updated(data)
-
-    # print(zipcode)
-    # print(avg_temp)
-    # print(pressure)
-    # print(humidity)
-    # print(weather_id)
-    # print(wind_speed)
-    # print(wind_direction)
-    # print(cloudiness)
-    # print(precipitation)
-    # print(last_updated)
-
     return data
 
 
