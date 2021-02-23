@@ -52,14 +52,13 @@ An API specifies what kind of interactions a user can have with a software. The 
 
 ## Backend Software
   * [Flask](https://flask.palletsprojects.com/en/1.1.x/) - The Python framework used for its backend tools.
-  * [Python2.7](https://www.python.org/downloads/) - The programming language of choice for the project.
+  * [Python3](https://www.python.org/downloads/) - The programming language of choice for the project.
   * [scikit-learn](https://scikit-learn.org/stable/install.html) - The Python library being used for machine learning.  
 ## Backend Installation Guide
 Before installing the following softwares, have the latest version of Python installed. Also note that these install commands are specific for the Ubuntu bash terminal. 
-### Flask
-   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$sudo apt update` - Ensures Ubuntu is up to date.
-   <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$sudo apt install python3-pip` - Install package management system.
-   <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$pip install Flask` - Install for Flask.
+   
+   `$sudo apt update` - Ensures Ubuntu is up to date.
+   <br>`$pip3 install -r requirements.txt` - Installs all requirements from the requirements text file. Make sure you've navigated to the correct folder!
     
 # Database
 <!-- ABOUT THE Database -->
