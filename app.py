@@ -45,7 +45,7 @@ def data():
 
 #Route Testing Data transfer from front end to Back end
 @app.route('/store_user', methods = ['POST','GET'])
-def data():
+def store_user():
 
     if 'zipcode' not in request.form or 'authKey' not in request.form :
         response = app.response_class(
