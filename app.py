@@ -42,6 +42,34 @@ def data():
     )
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
+
+#Route Testing Data transfer from front end to Back end
+@app.route('/store_user', methods = ['POST','GET'])
+def data():
+
+    if 'zipcode' not in request.form or 'authKey' not in request.form :
+        response = app.response_class(
+            response=json.dumps({'success':False}),
+            status=404,
+            mimetype='application/json'
+        )
+        return response
+    
+    zipcode = request.form['zipcode']
+    authKey = request.form['authKey']
+
+    responseD = {
+        'zipcode' : zipcode,
+        'authKey' : authKey
+    }
+
+    response = app.response_class(
+        response=json.dumps(responseD),
+        status=200,
+        mimetype='application/json'
+    )
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
     
     
 
