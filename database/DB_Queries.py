@@ -98,6 +98,8 @@ def Insert_User_Query(email, spotify_id, date, time, city_id):
                             VALUES (DEFAULT, :input_1, :input_2, :input_3, :input_4, :input_5, :input_6);""" 
         connection.execute(text(insert_query),  input_1 = email, input_2 = cipher_text, input_3 = spotify_id    , 
                                                 input_4 = date, input_5 = time , input_6 = city_id )
+    
+    return insert_query # or other meaningful information?
         
 def Insert_Cities_Query(city_name, state_id):
 
@@ -110,7 +112,7 @@ def Insert_Cities_Query(city_name, state_id):
                             VALUES(DEFAULT, :input_1, :input_2);""" 
         connection.execute(text(insert_query), input_1 = city_name, input_2 = state_id) 
 
-    return query_result
+    return insert_query
 
 def Insert_States_Query(state_name, country_id):
 
@@ -123,7 +125,7 @@ def Insert_States_Query(state_name, country_id):
                             VALUES(DEFAULT, :input_1, :input_2);""" 
         connection.execute(text(insert_query), input_1 = state_name, input_2 = country_id )
 
-    return query_result
+    return insert_query
 
 def Insert_Countries_Query(country_name):
 
@@ -135,7 +137,7 @@ def Insert_Countries_Query(country_name):
         insert_query =  """INSERT INTO "countries"(country_id, country_name) VALUES(DEFAULT, :input);""" 
         connection.execute(text(insert_query), input = country_name )
 
-    return query_result
+    return insert_query
 
 def Insert_Daily_Forecasts_Query(weather_date, average_temp, pressure, humidity, wind_speed, wind_direction, cloudiness, 
                             precipitation_volume, snow_volume, precipitation_probability, time_updated, city_id):
@@ -152,5 +154,5 @@ def Insert_Daily_Forecasts_Query(weather_date, average_temp, pressure, humidity,
                                                 input_6 = wind_direction, input_7 = cloudiness, input_8 = precipitation_volume, input_9 = snow_volume, 
                                                 input_10 = precipitation_probability, input_11 = time_updated, input_12 = city_id)
 
-    return query_result
+    return insert_query
 
