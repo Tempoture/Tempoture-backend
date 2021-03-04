@@ -1,5 +1,6 @@
 from flask import Flask
 # import Flask-APScheduler
+import requests
 from flask_apscheduler import APScheduler
 
 # set configuration values
@@ -18,9 +19,17 @@ scheduler.init_app(app)
 scheduler.start()
 
 # interval example
-@scheduler.task('interval', id='test_job', seconds=15, misfire_grace_time=300)
-def job1():
-    print('Testing flask-APScheduler for Tempoture!')
+@scheduler.task('interval', id='Call_Store', seconds=30, misfire_grace_time=300)
+def store():
+    auth_header = {
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
+    try:
+        resp = requests.get("http://127.0.0.1:5000/store_tracks", headers=auth_header)
+        resp.raise_for_status()
+        print(resp.json())
+    except requests.exceptions.HTTPError as err:
+        raise SystemExit(err)
 
 if __name__ == '__main__':
-    app.run()
+    app.run(port=8080)

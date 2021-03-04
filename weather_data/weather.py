@@ -12,10 +12,8 @@ try:
     WEATHER_KEY = os.environ['WEATHER_API_KEY']
 except Exception: 
     load_dotenv()
-    
     GEO_KEY = os.getenv('GEO_API_KEY')
     WEATHER_KEY = os.getenv('WEATHER_API_KEY')
-
 
 # Return user's zip code
 def get_zip_code():
@@ -44,10 +42,22 @@ def get_current_weather():
         units_type = 'imperial'
         wr = requests.get('http://api.openweathermap.org/data/2.5/weather?zip={0},{1}&mode=xml&appid={2}&units={3}'.format(zipcode,countrycode,WEATHER_KEY,units_type))
         weatherdict = xmltodict.parse(wr.content)
-    except Exception:
-        return dict()
+    except requests.exceptions.RequestException as e:  # This is the correct syntax
+        raise SystemExit(e)
     return weatherdict
 
+# Note from OpenWeather API:
+# If you do not see some of the parameters in your API response it means that these weather 
+# phenomena are just not happened for the time of measurement for the city or location chosen. 
+# Only really measured or calculated data is displayed in API response.
+def get_weather_from_zipcode(zipcode,country_code):
+    try:
+        units_type = 'imperial'
+        wr = requests.get('http://api.openweathermap.org/data/2.5/weather?zip={0},{1}&mode=xml&appid={2}&units={3}'.format(zipcode,country_code,WEATHER_KEY,units_type))
+        weatherdict = xmltodict.parse(wr.content)
+    except requests.exceptions.RequestException as e:  # This is the correct syntax
+        raise SystemExit(e)
+    return weatherdict
 
 # Weather Data for User
 # Table includes:
