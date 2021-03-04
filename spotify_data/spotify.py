@@ -34,7 +34,7 @@ def get_all_songs_audio(access_token,market_id):
             for track in resp.json()["items"]:
                 song_id.append(track['track']['id'])
         except requests.exceptions.HTTPError as err:
-            raise SystemExit(err)
+            print("ERR:" + str(err))
     id_str =  ",".join(song_id)
     req_endpoint = f'https://api.spotify.com/v1/audio-features/?ids={id_str}'
     auth_header = {"Authorization": "Bearer {}".format(access_token)}
@@ -48,7 +48,7 @@ def get_all_songs_audio(access_token,market_id):
             temp_d[a['id']] = a
         audio_j = temp_d
     except requests.exceptions.HTTPError as err:
-        raise SystemExit(err)
+        print("ERR:" + str(err))
     return audio_j
     
 

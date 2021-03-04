@@ -43,7 +43,7 @@ def get_current_weather():
         wr = requests.get('http://api.openweathermap.org/data/2.5/weather?zip={0},{1}&mode=xml&appid={2}&units={3}'.format(zipcode,countrycode,WEATHER_KEY,units_type))
         weatherdict = xmltodict.parse(wr.content)
     except requests.exceptions.RequestException as e:  # This is the correct syntax
-        raise SystemExit(e)
+        print("ERR:" + str(err))
     return weatherdict
 
 # Note from OpenWeather API:
@@ -56,7 +56,7 @@ def get_weather_from_zipcode(zipcode,country_code):
         wr = requests.get('http://api.openweathermap.org/data/2.5/weather?zip={0},{1}&mode=xml&appid={2}&units={3}'.format(zipcode,country_code,WEATHER_KEY,units_type))
         weatherdict = xmltodict.parse(wr.content)
     except requests.exceptions.RequestException as e:  # This is the correct syntax
-        raise SystemExit(e)
+        print("ERR:" + str(err))
     return weatherdict
 
 # Weather Data for User

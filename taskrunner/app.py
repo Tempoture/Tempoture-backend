@@ -27,9 +27,8 @@ def store():
     try:
         resp = requests.get("http://127.0.0.1:5000/store_tracks", headers=auth_header)
         resp.raise_for_status()
-        print(resp.json())
     except requests.exceptions.HTTPError as err:
-        raise SystemExit(err)
+        print("ERR:" + str(err))
 
 if __name__ == '__main__':
     app.run(port=8080)
