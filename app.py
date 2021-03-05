@@ -56,17 +56,14 @@ def store_user():
     status = 404
     success = False
     message = "Fields are incorrect"
-    if 'refresh_token' in request.form and 'access_token' in request.form and 'last_refresh' in request.form and 'zip_code' in request.form and 'country' in request.form:
+    if 'refresh_token' in request.form and 'access_token' in request.form and 'last_refresh' in request.form and 'display_name' in request.form and 'zip_code' in request.form and 'country' in request.form:
         refresh_token = request.form['refresh_token']
         access_token = request.form['access_token']
         zip_code = request.form['zip_code']
+        name = request.form['display_name']
         country = request.form['country']
         last_refresh = request.form['last_refresh']
         with open('data.json','r') as f:
-            headers = {'Authorization': ('Bearer ' + access_token)}
-            resp = requests.get("https://api.spotify.com/v1/me",headers=headers)
-            if resp.status_code == 200:
-                name = resp.json()["display_name"]
                 data = json.load(f)
                 status = 200
                 success = True
@@ -97,6 +94,37 @@ def store_user():
     )
     return response
 
+@app.route('/update_location', methods = ['POST'])
+def update_location():
+    status = 404
+    success = False
+    message = "Fields are incorrect"
+    if 'display_name' in request.form and 'zip_code' in request.form and 'country' in request.form:
+        with open('data.json','r') as f:
+            data = json.load(f)
+            new_write = dict()
+            name = request.form['display_name']
+            zip_code = request.form['zip_code']
+            country = request.form['country']
+            data[name]['last_zip_code'] = zip_code
+            data[name]['last_country'] = country
+            if data[name]['zip_code'] is 'ZipCode N/A':
+                data[name]['zip_code'] = zip_code
+                data[name]['country'] = country
+            new_write = data
+            with open('data.json','w') as w:
+                json.dump(new_write,w, indent = 4)
+            success = True
+            status = 200
+            message = "Updated Location"
+    response = app.response_class(
+        response=json.dumps({'success':success,'message' : message}),
+        status=status,
+        mimetype='application/json'
+    )
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+            
 
 @app.route('/store_tracks', methods = ['GET'])
 def store_tracks():
