@@ -90,8 +90,8 @@ def store_user():
                             'dates' : dict()
                         }
                     }
-                    with open('data.json','w') as w:
-                        json.dump(data_name,w,  indent = 4)
+                    with open('data.json','w') as w: # TEST
+                        json.dumps(data_name,w,  indent = 4)
                         message = "User inserted"
                 else:
                     message = "User already inserted"
