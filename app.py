@@ -91,7 +91,7 @@ def store_user():
                         }
                     }
                     with open('data.json','w') as w: # TEST
-                        json.dumps(data_name,w,  indent = 4)
+                        json.dump(data_name,w,  indent = 4)
                         message = "User inserted"
                 else:
                     message = "User already inserted"
@@ -100,6 +100,18 @@ def store_user():
         status=status,
         mimetype='application/json'
     )
+    return response
+
+@app.route('/get_data', methods = ['GET'])
+def get_data():
+    with open('data.json','r') as f:
+        data = json.load(f)
+    response = app.response_class(
+        response=json.dumps({'JSON':data},indent=4),
+        status=200,
+        mimetype='application/json'
+    )
+    response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
 @app.route('/update_location', methods = ['POST'])
