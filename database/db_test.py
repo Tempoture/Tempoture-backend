@@ -12,10 +12,10 @@ import datetime
 # connect to the database
 conn = psycopg2.connect(
     """
-    dbname = ddo0pi87t3p6om
+    dbname = "FILL IN LATER"
     host = ec2-54-85-13-135.compute-1.amazonaws.com
-    user = jigioikuunxcdq
-    password = bc8cac1776ca584c597ce485deaf9ead86a3ffcbe1e10a281bcf4f146fafd7a5
+    user = "FILL IN LATER"
+    password = "FILL IN LATER"
     port = 5432
     """
 )
