@@ -3,6 +3,8 @@ import xmltodict
 import os
 from flask import Flask, request, jsonify, redirect
 from dotenv import load_dotenv
+import time
+import socket
 
 GEO_KEY = ""
 WEATHER_KEY = ""
@@ -32,19 +34,23 @@ def get_zip_code():
 # phenomena are just not happened for the time of measurement for the city or location chosen. 
 # Only really measured or calculated data is displayed in API response.
 def get_current_weather():
-    CLIENT_IP = request.remote_addr
-    CURRENT_GEO_ENDPOINT = 'https://api.ipgeolocation.io/ipgeo?apiKey={0}&ip={1}&fields=geo'.format(GEO_KEY,CLIENT_IP)    
-    r = requests.get(CURRENT_GEO_ENDPOINT)
-    thedict=r.json()
+    weather_dict = {}
     try:
+        CLIENT_IP = request.remote_addr
+        CURRENT_GEO_ENDPOINT = 'https://api.ipgeolocation.io/ipgeo?apiKey={0}&ip={1}&fields=geo'.format(GEO_KEY,CLIENT_IP)    
+        r = requests.get(CURRENT_GEO_ENDPOINT)
+        r.raise_for_status()
+        thedict=r.json()
         zipcode=thedict['zipcode']
         countrycode=thedict['country_code2']
         units_type = 'imperial'
         wr = requests.get('http://api.openweathermap.org/data/2.5/weather?zip={0},{1}&mode=xml&appid={2}&units={3}'.format(zipcode,countrycode,WEATHER_KEY,units_type))
-        weatherdict = xmltodict.parse(wr.content)
+        wr.raise_for_status()
+        weather_dict = xmltodict.parse(wr.content)
     except requests.exceptions.RequestException as e:  # This is the correct syntax
-        print("ERR:" + str(err))
-    return weatherdict
+        print(f'ERROR:{str(e)}')
+        weather_dict = {"ERROR" : str(e)}
+    return weather_dict
 
 # Note from OpenWeather API:
 # If you do not see some of the parameters in your API response it means that these weather 
@@ -59,6 +65,24 @@ def get_weather_from_zipcode(zipcode,country_code):
         print("ERR:" + str(err))
     return weatherdict
 
+def get_weather_from_latlong(latitude,longitude):
+    try:
+        units_type = 'imperial'
+        wr = requests.get('http://api.openweathermap.org/data/2.5/weather?lat={0}&long={1}&mode=xml&appid={2}&units={3}'.format(latitude,longitude,WEATHER_KEY,units_type))
+        weatherdict = xmltodict.parse(wr.content)
+    except requests.exceptions.RequestException as e:  # This is the correct syntax
+        print("ERR:" + str(err))
+    return weatherdict
+
+
+def get_historical_weather_latlong(latitude,longitude,date):#Date: Unix timestamp
+    try:
+        units_type = 'imperial'
+        wr = requests.get('https://api.openweathermap.org/data/2.5/onecall/timemachine?lat={lat}&lon={lon}&dt={time}&appid={key}&units={units}'.format(latitude,longitude,date,WEATHER_KEY,units_type))
+        weatherdict = xmltodict.parse(wr.content)
+    except requests.exceptions.RequestException as e:  # This is the correct syntax
+        print("ERR:" + str(err))
+    return weatherdict
 # Weather Data for User
 # Table includes:
 #   - daily_forecast_id

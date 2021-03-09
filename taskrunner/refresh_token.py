@@ -32,8 +32,10 @@ def check_new_token(token,refresh_token,last_refresh):
             resp = requests.post('https://accounts.spotify.com/api/token',params=urllib.parse.urlencode(d),headers=auth_header)
             resp.raise_for_status()
             access_token = resp.json()['access_token']
-            curr = int(time.time())
+            if token != access_token:
+                curr = int((time.time() * 1000))
+                return (access_token,curr)
         except requests.exceptions.HTTPError as err:
             print("ERR:" + str(err))
-    return (access_token,curr)
+    return (token,last_refresh)
         

@@ -1,6 +1,9 @@
 from flask import Flask
 # import Flask-APScheduler
 import requests
+import csv
+import datetime
+import json
 from flask_apscheduler import APScheduler
 
 # set configuration values
@@ -19,16 +22,15 @@ scheduler.init_app(app)
 scheduler.start()
 
 # interval example
-@scheduler.task('interval', id='Call_Store', seconds=30, misfire_grace_time=300)
+@scheduler.task('cron', id='Call_Store', minute='0-59/15', misfire_grace_time=1)
 def store():
     auth_header = {
         "Content-Type": "application/x-www-form-urlencoded"
     }
     try:
-        resp = requests.get("http://127.0.0.1:5000/store_tracks", headers=auth_header)
+        resp = requests.get("http://localhost:5000/store_tracks", headers=auth_header)
         resp.raise_for_status()
     except requests.exceptions.HTTPError as err:
         print("ERR:" + str(err))
-
 if __name__ == '__main__':
     app.run(port=8080)
