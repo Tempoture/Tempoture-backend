@@ -25,11 +25,12 @@ class SpotifyClient:
     # https://developer.spotify.com/web-api/web-api-personalization-endpoints/get-recently-played
     # Access Token requires scope: user-read-recently-played
     def get_recent_tracks(self, after=None):
-        """
-        :param after (int): timestamp in milliseconds. (optional)
-        Returns all items after (but not including) this cursor position. 
-
-        """
+    #  Input:
+    #  after = optional timestamp in milliseconds (int)
+    #  
+    #  Output: 
+    #  trackURIs = list of Spotify track URIs from user's recently played  
+    #
         url = RECENT_TRACKS_ENDPOINT
         if after is not None:
             url += ('&after=' + str(after))
@@ -46,11 +47,13 @@ class SpotifyClient:
     # https://developer.spotify.com/documentation/web-api/reference/#endpoint-create-playlist
     # Scopes needed: playlist-modify-public & playlist-modify-private
     def create_playlist(self, name=None, desc=None):
-        """
-        :param name (str): New Playlist's name
-        :param desc (str): New Playlist's description
-        
-        """
+    #  Input:
+    #  name = optional argument for custom name of new playlist, will default to hardcoded string if none (str)
+    #  desc = optional argument for custom description of new playlist, will default to hardcoded string if none (str)  
+    #
+    #  Output: 
+    #  playlist_id = id of the newly created playlist  
+    #
 
         url = CREATE_PLAYLISTS_ENDPOINT.format(self.user_id)
         if name is None:
@@ -70,6 +73,15 @@ class SpotifyClient:
         return playlist_id
 
     def change_playlist_cover(self, playlist_id, cover=None):
+    #  Input:
+    #  playlist_id = Spotify playlist id (int)
+    #  cover = optional argument for custom album cover photo, will default to hardcoded encoded string if none (str)  
+    #
+    #  @todo: 
+    #  Output: 
+    #  a bool which determines if cover change went through successfully
+    #    
+    #
         url = CHANGE_PLAYLIST_COVER_ENDPOINT.format(playlist_id)
         if (cover is None):
             cover = DEFAULT_PLAYLIST_COVER
@@ -110,6 +122,14 @@ class SpotifyClient:
 
     # Create a new demo playlist and populate with your 5 most recent songs 
     def test_create_and_populate(self, name=None, desc=None):
+    #  Input:
+    #  name = optional argument for custom name of new playlist, will default to hardcoded string if none (str)
+    #  desc = optional argument for custom description of new playlist, will default to hardcoded string if none (str)  
+    #
+    #  Output: 
+    #  snapshot_id = a Spotify snapshot id which represents the specific playlist version  (int)
+    #    
+    #
         playlist_id = self.create_playlist(name, desc)
         self.change_playlist_cover(playlist_id)
         url = ADD_TRACKS_PLAYLISTS_ENDPOINT.format(playlist_id)
