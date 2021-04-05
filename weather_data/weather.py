@@ -1,6 +1,8 @@
 import requests
 import xmltodict
 import os
+import json
+from datetime import datetime,timedelta
 from flask import Flask, request, jsonify, redirect
 from dotenv import load_dotenv
 import time
@@ -51,6 +53,16 @@ def get_current_weather():
         print(f'ERROR:{str(e)}')
         weather_dict = {"ERROR" : str(e)}
     return weather_dict
+
+def get_prev_day_data(lat,lng):
+    try:
+        prev_day = datetime.utcnow() - timedelta(days = 1)
+        wr =  requests.get(f"http://api.openweathermap.org/data/2.5/onecall/timemachine?lat={lat}&lon={lng}&dt={int(prev_day.timestamp())}&appid={WEATHER_KEY}")
+        wr.raise_for_status()
+        return wr.json()['hourly']
+    except requests.exceptions.RequestException as e:  # This is the correct syntax
+        print(f'ERROR:{str(e)}')
+        return dict()
 
 # Note from OpenWeather API:
 # If you do not see some of the parameters in your API response it means that these weather 
@@ -161,3 +173,5 @@ def get_last_updated(data):
         return data['current']['lastupdate']['@value']
     except Exception:
         return -1
+
+get_prev_day_data(40.178098,-74.241539)

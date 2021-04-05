@@ -1,13 +1,24 @@
-from datetime import datetime, timedelta
-from pyzipcode import ZipCodeDatabase
+from datetime import datetime, timedelta,timezone
 from timezonefinder import TimezoneFinder
 from astral import LocationInfo
 from astral.sun import sun
 import pytz
+import os
+import requests
+from dotenv import load_dotenv
+from timezonefinder import TimezoneFinder
 
-def get_SunPosition(latitude,longitude,curr_time):
+GOOGLE_MAP_KEY = ''
+try:
+    GOOGLE_MAP_KEY = os.environ['GOOGLE_MAP_KEY']
+except Exception:
+    load_dotenv()
+    GOOGLE_MAP_KEY = os.getenv('GOOGLE_MAP_KEY')
+
+
+def get_SunPosition(latitude, longitude, curr_time):
     tf = TimezoneFinder()
-    utc=pytz.UTC
+    utc = pytz.UTC
     time_zone = tf.timezone_at(lng=longitude, lat=latitude)
     location = LocationInfo()
     location.name = 'name'
@@ -16,9 +27,10 @@ def get_SunPosition(latitude,longitude,curr_time):
     location.longitude = longitude
     location.timezone = time_zone
     location.elevation = 0
-    curr_datetime = utc.localize(datetime.strptime(curr_time,"%m/%d/%Y : %H:%M"))
-    s = sun(location.observer,curr_datetime)
-    if curr_datetime >= s["dawn"] and curr_datetime < s["sunrise"] :
+    curr_datetime = utc.localize(
+        datetime.strptime(curr_time, "%m/%d/%Y : %H:%M"))
+    s = sun(location.observer, curr_datetime)
+    if curr_datetime >= s["dawn"] and curr_datetime < s["sunrise"]:
         return "Dawn"
     elif curr_datetime >= s["sunrise"] and curr_datetime < s["noon"]:
         return "Sunrise"
@@ -30,11 +42,8 @@ def get_SunPosition(latitude,longitude,curr_time):
         return "Dusk"
 
 
-def getTimePeriod(zipcode,curr_time):
-    curr_datetime = datetime.strptime(curr_time,"%m/%d/%Y : %H:%M")
-    zip_id = int(zipcode.lstrip('0'))
-    zcdb = ZipCodeDatabase()
-    converted_time = curr_datetime + timedelta(hours=zcdb[zip_id].timezone)
+def getTimePeriod(latitude,longitude, curr_time):
+    converted_time = getConvertedTime(curr_time,getTimeZone(latitude, longitude))
     if converted_time.hour == 12:
         return "Noon"
     elif converted_time.hour < 12 and converted_time.hour >= 5:
@@ -48,9 +57,27 @@ def getTimePeriod(zipcode,curr_time):
     else:
         return "Night"
 
-def getConvertedTime(zipcode,curr_time):
-    curr_datetime = datetime.strptime(curr_time,"%m/%d/%Y : %H:%M")
-    zip_id = int(zipcode.lstrip('0'))
-    zcdb = ZipCodeDatabase()
-    converted_time = curr_datetime + timedelta(hours=zcdb[zip_id].timezone)
-    return converted_time.strftime("%m/%d/%Y : %H:%M")
+
+def get_long_lat(zipcode, country):
+    maps_query = f'https://maps.google.com/maps/api/geocode/json?components=country:{country}|postal_code:{zipcode}&sensor=false&key={GOOGLE_MAP_KEY}'
+    try:
+        resp = requests.get(maps_query)
+        resp.raise_for_status()
+        if resp.json()['status'] == 'ZERO_RESULTS':
+            location = dict()
+        else:
+            location = resp.json()['results'][0]['geometry']['location']
+        return location
+    except requests.exceptions.HTTPError as err:
+        print("ERR:" + str(err))
+        return dict()
+
+
+def getTimeZone(latitude, longitude):
+    obj = TimezoneFinder()
+    return obj.timezone_at(lng=longitude, lat=latitude)
+
+def getConvertedTime(curr_date,given_timezone):
+    curr_datetime = datetime.strptime(curr_date, "%m/%d/%Y : %H:%M")
+    local_tz = pytz.timezone(given_timezone)
+    return curr_datetime.replace(tzinfo=timezone.utc).astimezone(local_tz)
