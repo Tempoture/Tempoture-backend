@@ -11,6 +11,10 @@ CREATE_PLAYLISTS_ENDPOINT = 'https://api.spotify.com/v1/users/{}/playlists'
 ADD_TRACKS_PLAYLISTS_ENDPOINT = 'https://api.spotify.com/v1/playlists/{}/tracks'
 CHANGE_PLAYLIST_COVER_ENDPOINT = 'https://api.spotify.com/v1/playlists/{}/images'
 DEFAULT_PLAYLIST_COVER = 'logo.jpeg'
+DEFAULT_PLAYLIST_NAME = 'Your Tempoture Playlist'
+DEFAULT_PLAYLIST_DESC = 'A custom-made playlist made by Tempoture for you!'
+
+
 
 class SpotifyClient:
     def __init__(self, access_token, user_id):
@@ -26,10 +30,12 @@ class SpotifyClient:
     # Access Token requires scope: user-read-recently-played
     def get_recent_tracks(self, after=None):
         """
-        :param after (int): timestamp in milliseconds. (optional)
-        Returns all items after (but not including) this cursor position. 
-
+        :param after (int): optional timestamp in milliseconds
+        
+        Output: 
+        trackURIs = list of Spotify track URIs from user's recently played  
         """
+
         url = RECENT_TRACKS_ENDPOINT
         if after is not None:
             url += ('&after=' + str(after))
@@ -47,9 +53,12 @@ class SpotifyClient:
     # Scopes needed: playlist-modify-public & playlist-modify-private
     def create_playlist(self, name=None, desc=None):
         """
-        :param name (str): New Playlist's name
-        :param desc (str): New Playlist's description
-        
+        :param name (str): = optional argument for custom name of new playlist, will default to hardcoded string if none
+        :param desc (str): = optional argument for custom description of new playlist, will default to hardcoded string if none
+
+        Output: 
+        playlist_id (int): id of the newly created playlist  
+
         """
 
         url = CREATE_PLAYLISTS_ENDPOINT.format(self.user_id)
@@ -66,10 +75,24 @@ class SpotifyClient:
         })
         response = self.post_api_request(url, data)
         resp_json = response.json()
-        playlist_id = resp_json["id"]
+        playlist_id = -1
+        try:
+            playlist_id = resp_json["id"]
+        except Exception:
+            print("Status " + str(resp_json["error"]["status"]) + ": " + resp_json["error"]["message"])
         return playlist_id
 
     def change_playlist_cover(self, playlist_id, cover=None):
+        """
+        Input:
+        :param playlist_id (int): Spotify playlist id
+        :param cover (str): optional argument for custom album cover photo, will default to hardcoded encoded string if none
+    
+        @todo: 
+        Output: 
+        a bool which determines if cover change went through successfully
+    
+        """
         url = CHANGE_PLAYLIST_COVER_ENDPOINT.format(playlist_id)
         if (cover is None):
             cover = DEFAULT_PLAYLIST_COVER
@@ -85,6 +108,31 @@ class SpotifyClient:
         },
         data = encoded_string
         )
+        return True
+
+    def add_playlist_tracks(self, playlist_id, track_uri_data):
+        """
+        Input:
+        :param playlist_id (int): Spotify playlist id
+        :param track_uri_data (list): a list of Spotify track URI's , ex. ['spotify:track:xxxxxx', 'spotify:track:yyyyyyy']
+    
+        @todo: 
+        Output: 
+        a bool which determines if cover change went through successfully
+    
+        """
+        data = json.dumps(track_uri_data)
+        url = ADD_TRACKS_PLAYLISTS_ENDPOINT.format(playlist_id)
+        response = self.post_api_request(url, data)
+        resp_json = response.json()
+        snapshot_id = -1
+        try:
+            snapshot_id = resp_json["snapshot_id"]
+        except Exception:
+            print("Status " + str(resp_json["error"]["status"]) + ": " + resp_json["error"]["message"])
+
+        print(resp_json)
+        return snapshot_id
 
     def get_api_request(self, url):
         response = requests.get(
@@ -110,6 +158,15 @@ class SpotifyClient:
 
     # Create a new demo playlist and populate with your 5 most recent songs 
     def test_create_and_populate(self, name=None, desc=None):
+        """
+        :param name (str): = optional argument for custom name of new playlist, will default to hardcoded string if none
+        :param desc (str): = optional argument for custom description of new playlist, will default to hardcoded string if none
+
+        Output: 
+        snapshot_id (int): a Spotify snapshot id which represents the specific playlist version
+
+        """
+
         playlist_id = self.create_playlist(name, desc)
         self.change_playlist_cover(playlist_id)
         url = ADD_TRACKS_PLAYLISTS_ENDPOINT.format(playlist_id)
@@ -120,4 +177,39 @@ class SpotifyClient:
         snapshot_id = resp_json["snapshot_id"]
         return snapshot_id
 
+
+   # Create a new demo playlist and populate with your 5 most recent songs 
+    def create_tempoture_playlist(self, track_uri_data, name=None, desc=None, cover=None):
+        """
+        Input:
+        :param track_uri_data (list): a list of Spotify track URI's , ex. ['spotify:track:xxxxxx', 'spotify:track:yyyyyyy']
+        :param name (str): optional argument for custom name of new playlist, will default to hardcoded string if none
+        :param desc (str): optional argument for custom description of new playlist, will default to hardcoded string if none
+        :param cover (str): optional argument for custom album cover photo, will default to hardcoded encoded string if none
+        
+        Output: 
+        playlist_id (int): id of newly created custom Spotify playlist
+
+        """
+        if name is None:
+            name = DEFAULT_PLAYLIST_NAME
+        if desc is None:
+            desc = DEFAULT_PLAYLIST_DESC
+        if cover is None:
+            cover = DEFAULT_PLAYLIST_COVER
+
+        playlist_id = self.create_playlist(name, desc)
+
+        if playlist_id == -1:
+            raise Exception("Could not create playlist.")
+        
+        if self.change_playlist_cover(playlist_id) == False:
+            raise Exception("Could not change playlist cover.")
+
+        snapshot_id = self.add_playlist_tracks(playlist_id, track_uri_data)
+
+        if  snapshot_id == -1:
+            raise Exception("Could not add tracks to playlist.")
+
+        return playlist_id
 

@@ -72,6 +72,8 @@ Before installing the following softwares, have the latest version of Python ins
 
 Above is a physical representation of the database that is used for the Tempoture project. The SQL to make this database can be found [here](https://github.com/Tempoture/Tempoture-Data-Base/blob/main/SQL-Queries/TempoDB_V1.sql). This database is used to store user data, Spotify music data, and local weather data. 
   <!-- fill this in -->
+The python script that is used to manipulate with the database (such as updating the weather data) can be found [here]
+(https://github.com/Tempoture/Tempoture-backend/blob/main/database/db_test.py)
   
   
 <!-- Software -->
