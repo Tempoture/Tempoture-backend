@@ -4,7 +4,7 @@ from spotify_data import spotify,genre_ml_classifier
 import requests
 from weather_data import weather
 import json
-from flask_apscheduler import APScheduler
+from apscheduler.schedulers.background import BackgroundScheduler
 from taskrunner import sun_time
 from database import ml_database,spotify_database
 import requests
@@ -16,11 +16,9 @@ app = Flask(__name__)
 CORS(app)
 curr_date = datetime.utcnow().strftime("%m/%d/%Y")
 
-scheduler = APScheduler()
+scheduler = BackgroundScheduler()
 # if you don't wanna use a config, you can set options here:
 # scheduler.api_enabled = True
-scheduler.api_enabled = True
-scheduler.init_app(app)
 scheduler.start()
 scheduler.add_job(func=task_app.store,trigger='interval',id='Store',seconds=10)
 
@@ -231,7 +229,7 @@ def store_tracks():
 
                 ml_database.Set0_NumHours(user_id)
                 try: # We only get the weather at the end of the day as we can get all of the days weather in a single call which is important to keep under the rate limit.
-                    resp = requests.get("http://localhost:5000/fill_weather")
+                    resp = requests.get("https://backendtempoture.herokuapp.com/fill_weather")
                     resp.raise_for_status()
                 except requests.exceptions.HTTPError as err:
                     print("ERR:" + str(err))
