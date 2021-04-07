@@ -12,10 +12,6 @@ from sklearn import preprocessing
 from sklearn.neural_network import MLPClassifier
 from sklearn.base import BaseEstimator,TransformerMixin
 
-column_order = ['popularity', 'acousticness', 'danceability', 'duration_ms', 'energy',
-       'instrumentalness', 'key', 'liveness', 'loudness', 'mode',
-       'speechiness', 'tempo', 'time_signature', 'valence', 'is_explicit',
-       'release_year']
 
 class DropTransformer(BaseEstimator,TransformerMixin):
     def __init__(self,drop=None):
@@ -50,7 +46,7 @@ def top3predictions(preds,model,encoder):
 def train_pipeline():
     data = pd.read_csv('CleanData.csv')
     full_prep_pipeline = Pipeline([
-        ('Drop',DropTransformer('loudness')),
+        ('Drop',DropTransformer('loudness')), # During the data analysis portion we found loudness was a collinear feature that wasn't really needed so we drop it.
         ('Scaler',StandardScaler()),
         ('MLPModel',MLPClassifier(max_iter=300))
     ])
@@ -64,7 +60,7 @@ def train_pipeline():
     y_pred_label = encoder.inverse_transform(y_pred)
     y_test_label = encoder.inverse_transform(y_test)
     metric= metrics.classification_report (y_pred_label,y_test_label)
-    dump(encoder,'Encoder.joblib')
+    dump(encoder,'Encoder.joblib') # We have so save the encoder to get back the actual values as the model just prints out integers.
     dump(full_prep_pipeline,'MLPModelPipeline.joblib')
 
 def test_saved_pipeline():
@@ -85,27 +81,30 @@ def test_saved_pipeline():
 
 '''
 song_info = {
-    "danceability": 0.5160,
-    "energy": 0.2380,
-    "key": float(4),
-    "loudness": -18.7100,
-    "mode": float(0),
-    "speechiness": 0.0343,
-    "acousticness": 0.8310,
-    "instrumentalness": 0.8510,
-    "liveness": 0.0934,
-    "valence": 0.0614,
-    "tempo": float(115),
-    "duration_ms": float(134507),
-    "time_signature": float(4),
-    "Song_name": "Yamanaiame",
-    "popularity": float(30),
-    "release_year": float(2018),
-    "is_explicit": float(0)
+    "danceability": float,
+    "energy": float,
+    "key": float,
+    "loudness": float,
+    "mode": int,
+    "speechiness": float,
+    "acousticness": float,
+    "instrumentalness": float,
+    "liveness": float,
+    "valence": float,
+    "tempo": float,
+    "duration_ms": float,
+    "time_signature": int,
+    "Song_name": Str,
+    "popularity": int,
+    "release_year": int,
+    "is_explicit": int
 } 
 '''
 def get_prediction(song_info):
-    global column_order
+    column_order = ['popularity', 'acousticness', 'danceability', 'duration_ms', 'energy',
+       'instrumentalness', 'key', 'liveness', 'loudness', 'mode',
+       'speechiness', 'tempo', 'time_signature', 'valence', 'is_explicit',
+       'release_year'] # We need to keep the order in the same way we had it during the training process.
     pipeline =  load('MLPModelPipeline.joblib')
     encoder  =  load('Encoder.joblib')
     if 'Song_name' in song_info:

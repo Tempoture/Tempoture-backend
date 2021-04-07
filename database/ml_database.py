@@ -28,47 +28,109 @@ except Exception:
     GOOGLE_MAP_KEY = os.getenv('GOOGLE_MAP_KEY')
 
 
+# TODO: Potentially use an ORM Like SQL Alchemy  to turn this into an object structure instead.
+# TODO: UNIT TEST insert methods on tables with no foreign keys
+# TODO: Integration tests for all the other methods.
 with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+database+';UID='+username+';PWD='+ password,autocommit=True) as conn:
-    def Insert_Location_Query(zipcode,country):
-        latlong = sun_time.get_long_lat(zipcode, country)
-        timezone_name = sun_time.getTimeZone(latlong['lat'],latlong['lng'])
-        Insert_TimeZone_Query(timezone_name)
-        TimeZone_ID = Get_TimeZone_ID_Query(timezone_name)
-        query_string = f"INSERT INTO Location (Zipcode,Country,TimeZone_ID) VALUES ('{zipcode}','{country}','{TimeZone_ID}');"
-        with conn.cursor() as cursor:
-            cursor.execute(query_string)
-    
-    def Get_TimeZone_ID_Query(timezone_name):
-        query_string = f"SELECT TimeZone_ID FROM TimeZone WHERE TimeZone_name = '{timezone_name}';"
-        with conn.cursor() as cursor:
-            cursor.execute(query_string)
-            row = cursor.fetchone()
-            return row[0]
     
     def Update_Data_Hour_Per_Location_Weather(Location_ID,UTC_Day_ID,UTC_Hour_ID,Weather_Characteristics_ID):
         query_string = f"UPDATE DataCollectedPerHour SET Weather_Characteristics_ID = {Weather_Characteristics_ID} WHERE UTC_Day_ID = {UTC_Day_ID} AND UTC_Hour_ID = {UTC_Hour_ID} AND Location_ID = {Location_ID}"
         with conn.cursor() as cursor:
             cursor.execute(query_string)
-            
-    def Get_TimeZone_ID_From_Location_Query(location_id):
-        query_string = f'SELECT TimeZone_ID FROM Location WHERE Location_ID = {location_id};'
-        with conn.cursor() as cursor:
-            cursor.execute(query_string)
-            row = cursor.fetchone()
-            return row[0]
     
     def Update_User_Last_Location(Location_ID,User_ID):
         query_string = f"UPDATE Users SET Last_Known_Location_ID = {Location_ID} WHERE User_ID = '{User_ID}'; "
         with conn.cursor() as cursor:
             cursor.execute(query_string)
     
+    def Update_Access_information(User_ID,access_token,last_refreshed):
+        query_string =  f"UPDATE Users SET access_token = '{access_token}',last_refreshed = {last_refreshed} WHERE User_ID = '{User_ID}'; "
+        with conn.cursor() as cursor:
+            cursor.execute(query_string)
+
+        
+    def Update_User_Home_Location(Location_ID,User_ID):
+        query_string = f"UPDATE Users SET Home_Location_ID = {Location_ID} WHERE User_ID = '{User_ID}'; "
+        with conn.cursor() as cursor:
+            cursor.execute(query_string)
+    
+    def Set0_NumHours(User_ID):
+        query_string =  f"UPDATE Users SET numHours= 0 WHERE User_ID = '{User_ID}'; "
+        with conn.cursor() as cursor:
+            cursor.execute(query_string)
+    
+    def Increment_NumHours(User_ID):
+        query_string =  f"UPDATE Users SET numHours=numHours + 1 WHERE User_ID = '{User_ID}'; "
+        with conn.cursor() as cursor:
+            cursor.execute(query_string)
+    
+    def Increment_NumRuns(User_ID):
+        query_string =  f"UPDATE Users SET numRuns=numRuns + 1 WHERE User_ID = '{User_ID}'; "
+        with conn.cursor() as cursor:
+            cursor.execute(query_string)
+    
+    def Increment_Data_Hour_Song_Played(DataCollectedPerHour_ID,Song_ID):
+        query_string = f"UPDATE DataCollectedPerHour_Songs SET numPlayed = numPlayed + 1 WHERE DataCollectedPerHour_ID = {DataCollectedPerHour_ID} AND Song_ID = '{Song_ID}'; "
+        with conn.cursor() as cursor:
+            cursor.execute(query_string)
+    
+    
+    def Check_User(user):
+        query_string = f"SELECT User_ID FROM Users WHERE User_ID = '{user}'"
+        with conn.cursor() as cursor:
+            cursor.execute(query_string)
+            row = cursor.fetchone()
+            return row
+    
+    def Check_Song(song):
+        query_string = f"SELECT Song_ID FROM Songs WHERE Song_ID = '{song}'"
+        with conn.cursor() as cursor:
+            cursor.execute(query_string)
+            row = cursor.fetchone()
+            return row
+    
+    def Check_DataCollectedPerHour(User_ID,date,hour):
+        query_string = f"SELECT *  FROM DataCollectedPerHour A inner join UTC_Day B on A.UTC_Day_ID = B.UTC_Day_ID inner join UTC_Hour C on A.UTC_Hour_ID = C.UTC_Hour_ID WHERE C.UTC_Hour = '{hour}' AND B.UTC_Day = '{date}' AND A.User_ID = '{User_ID}'"
+        with conn.cursor() as cursor:
+            cursor.execute(query_string)
+            row = cursor.fetchone()
+            return row
+    
+    def Check_User_Playlist_Songs(User_ID,Song_ID):
+        query_string = f"SELECT B.Song_ID FROM Users_Playlists A inner join  Songs_Playlists B on A.Playlist_ID = B.Playlist_ID WHERE A.User_ID = '{User_ID}' AND B.Song_ID ='{Song_ID}';"
+        with conn.cursor() as cursor:
+            cursor.execute(query_string)
+            row = cursor.fetchone()
+            return row
+
+    def Check_User_Recent_Songs(User_ID,Song_ID):
+        query_string = f"SELECT Song_ID FROM RecentlyPlayedSongs_User WHERE User_ID = '{User_ID}' AND Song_ID = '{Song_ID}';"
+        with conn.cursor() as cursor:
+            cursor.execute(query_string)
+            row = cursor.fetchone()
+            return row
+    
+    def Check_Data_Hour_Songs(User_ID,Song_ID,DataCollectedPerHour_ID):
+        query_string = f"SELECT Song_ID FROM DataCollectedPerHour_Songs WHERE DataCollectedPerHour_ID = {DataCollectedPerHour_ID} AND Song_ID = '{Song_ID}';"
+        with conn.cursor() as cursor:
+            cursor.execute(query_string)
+            row = cursor.fetchone()
+            return row
+
+    def Get_User_Playlist_Songs(User_ID):
+        query_string = f"SELECT B.Song_ID FROM Users_Playlists A inner join  Songs_Playlists B on A.Playlist_ID = B.Playlist_ID WHERE A.User_ID = '{User_ID}';"
+        with conn.cursor() as cursor:
+            cursor.execute(query_string)
+            playlist_songs = [row[0] for row in cursor.fetchall()]
+            return playlist_songs
+
     def Get_Users():
         query_string = f"SELECT USER_ID FROM Users;"
         with conn.cursor() as cursor:
             cursor.execute(query_string)
             users = [row[0] for row in cursor.fetchall()]
             return users
-    
+
     def Get_Location_Data(Location_ID):
         location_query_string = f"SELECT Zipcode,Country FROM Location WHERE Location_ID = {Location_ID}"
         with conn.cursor() as cursor:
@@ -78,20 +140,6 @@ with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+da
     
     def Get_User_NumRuns(User_ID):
         query_string = f"SELECT numRuns FROM Users WHERE User_ID='{User_ID}';"
-        with conn.cursor() as cursor:
-            cursor.execute(query_string)
-            row = cursor.fetchone()
-            return row[0]
-    
-    def Get_User_Day_Data_ID(User_ID,date):
-        query_string = f"SELECT A.DataCollectedPerDate_ID FROM DataCollectedPerDate A inner join UTC_Day B on A.UTC_Day_ID = B.UTC_Day_ID WHERE A.User_ID = '{User_ID}' AND B.UTC_Day = '{date}';"
-        with conn.cursor() as cursor:
-            cursor.execute(query_string)
-            row = cursor.fetchone()
-            return row[0]
-    
-    def Get_User_Hour_Data_ID(User_ID,hour,date):
-        query_string = f"SELECT A.DataCollectedPerHour_ID FROM DataCollectedPerHour A inner join UTC_Hour B on A.UTC_Hour_ID = B.UTC_Hour_ID inner join UTC_Day C on C.UTC_Day_ID = A.UTC_Day_ID WHERE A.User_ID = '{User_ID}' AND B.UTC_Hour = '{hour}' AND C.UTC_Day = '{date}';"
         with conn.cursor() as cursor:
             cursor.execute(query_string)
             row = cursor.fetchone()
@@ -123,63 +171,7 @@ with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+da
             locations = [row[0] for row in cursor.fetchall()]
             return locations
     
-    def Increment_NumHours(User_ID):
-        query_string =  f"UPDATE Users SET numHours=numHours + 1 WHERE User_ID = '{User_ID}'; "
-        with conn.cursor() as cursor:
-            cursor.execute(query_string)
-    
-    def Set0_NumHours(User_ID):
-        query_string =  f"UPDATE Users SET numHours= 0 WHERE User_ID = '{User_ID}'; "
-        with conn.cursor() as cursor:
-            cursor.execute(query_string)
-    
-    def Increment_NumRuns(User_ID):
-        query_string =  f"UPDATE Users SET numRuns=numRuns + 1 WHERE User_ID = '{User_ID}'; "
-        with conn.cursor() as cursor:
-            cursor.execute(query_string)
-    
-    def Update_Access_information(User_ID,access_token,last_refreshed):
-        query_string =  f"UPDATE Users SET access_token = '{access_token}',last_refreshed = {last_refreshed} WHERE User_ID = '{User_ID}'; "
-        with conn.cursor() as cursor:
-            cursor.execute(query_string)
-
-    
-    def Get_User_Playlist_Songs(User_ID):
-        query_string = f"SELECT B.Song_ID FROM Users_Playlists A inner join  Songs_Playlists B on A.Playlist_ID = B.Playlist_ID WHERE A.User_ID = '{User_ID}';"
-        with conn.cursor() as cursor:
-            cursor.execute(query_string)
-            playlist_songs = [row[0] for row in cursor.fetchall()]
-            return playlist_songs
-    
-    def Check_DataCollectedPerHour(User_ID,date,hour):
-        query_string = f"SELECT *  FROM DataCollectedPerHour A inner join UTC_Day B on A.UTC_Day_ID = B.UTC_Day_ID inner join UTC_Hour C on A.UTC_Hour_ID = C.UTC_Hour_ID WHERE C.UTC_Hour = '{hour}' AND B.UTC_Day = '{date}' AND A.User_ID = '{User_ID}'"
-        with conn.cursor() as cursor:
-            cursor.execute(query_string)
-            row = cursor.fetchone()
-            return row
-    
-    def Check_User_Playlist_Songs(User_ID,Song_ID):
-        query_string = f"SELECT B.Song_ID FROM Users_Playlists A inner join  Songs_Playlists B on A.Playlist_ID = B.Playlist_ID WHERE A.User_ID = '{User_ID}' AND B.Song_ID ='{Song_ID}';"
-        with conn.cursor() as cursor:
-            cursor.execute(query_string)
-            row = cursor.fetchone()
-            return row
-
-    def Check_User_Recent_Songs(User_ID,Song_ID):
-        query_string = f"SELECT Song_ID FROM RecentlyPlayedSongs_User WHERE User_ID = '{User_ID}' AND Song_ID = '{Song_ID}';"
-        with conn.cursor() as cursor:
-            cursor.execute(query_string)
-            row = cursor.fetchone()
-            return row
-    
-    def Check_Data_Hour_Songs(User_ID,Song_ID,DataCollectedPerHour_ID):
-        query_string = f"SELECT Song_ID FROM DataCollectedPerHour_Songs WHERE DataCollectedPerHour_ID = {DataCollectedPerHour_ID} AND Song_ID = '{Song_ID}';"
-        with conn.cursor() as cursor:
-            cursor.execute(query_string)
-            row = cursor.fetchone()
-            return row
-    
-    def Get_Song_Genre_Query(song_id):
+    def Get_Song_Genre(song_id):
         query_string = f"SELECT A.Song_ID,B.Genre,A.Confidence FROM Song_Genres A inner join Genres B on A.Genre_ID = B.Genre_ID WHERE Song_ID='{song_id}';"
         with conn.cursor() as cursor:
             cursor.execute(query_string)
@@ -196,13 +188,6 @@ with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+da
             location_data = cursor.fetchone()
             return location_data
     
-    def Get_User_Last_Location_ID(User_ID):
-        query_string = f"SELECT Last_Known_Location_ID FROM Users WHERE User_ID = '{User_ID}'"
-        with conn.cursor() as cursor:
-            cursor.execute(query_string)
-            location_id = cursor.fetchone()
-            return location_id[0]
-    
     def Get_User_Last_Location(User_ID):
         query_string = f"SELECT Last_Known_Location_ID FROM Users WHERE User_ID = '{User_ID}'"
         with conn.cursor() as cursor:
@@ -213,72 +198,64 @@ with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+da
             location_data = cursor.fetchone()
             return location_data
         
-    def Update_User_Home_Location(Location_ID,User_ID):
-        query_string = f"UPDATE Users SET Home_Location_ID = {Location_ID} WHERE User_ID = '{User_ID}'; "
+    def Get_TimeZone_ID(timezone_name):
+        query_string = f"SELECT TimeZone_ID FROM TimeZone WHERE TimeZone_name = '{timezone_name}';"
         with conn.cursor() as cursor:
             cursor.execute(query_string)
+            row = cursor.fetchone()
+            return row[0]
     
-    def Increment_Data_Hour_Song_Played(DataCollectedPerHour_ID,Song_ID):
-        query_string = f"UPDATE DataCollectedPerHour_Songs SET numPlayed = numPlayed + 1 WHERE DataCollectedPerHour_ID = {DataCollectedPerHour_ID} AND Song_ID = '{Song_ID}'; "
+    def Get_TimeZone_ID_From_Location(location_id):
+        query_string = f'SELECT TimeZone_ID FROM Location WHERE Location_ID = {location_id};'
         with conn.cursor() as cursor:
             cursor.execute(query_string)
+            row = cursor.fetchone()
+            return row[0]
     
-    def Get_Location_ID_Query(zipcode,country):
+    def Get_User_Day_Data_ID(User_ID,date_id):
+        query_string = f"SELECT DataCollectedPerDate_ID FROM DataCollectedPerDate WHERE User_ID = '{User_ID}' AND UTC_Day_ID = '{date_id}';"
+        with conn.cursor() as cursor:
+            cursor.execute(query_string)
+            row = cursor.fetchone()
+            return row[0]
+    
+    def Get_User_Hour_Data_ID(User_ID,hour_id,date_id):
+        query_string = f"SELECT DataCollectedPerHour_ID FROM DataCollectedPerHour WHERE User_ID = '{User_ID}' AND UTC_Hour_ID = '{hour_id}' AND UTC_Day_ID = '{date_id}';"
+        with conn.cursor() as cursor:
+            cursor.execute(query_string)
+            row = cursor.fetchone()
+            return row[0]
+    
+    def Get_User_Last_Location_ID(User_ID):
+        query_string = f"SELECT Last_Known_Location_ID FROM Users WHERE User_ID = '{User_ID}'"
+        with conn.cursor() as cursor:
+            cursor.execute(query_string)
+            location_id = cursor.fetchone()
+            return location_id[0]
+
+    
+    def Get_Location_ID(zipcode,country):
         query_string = f"SELECT Location_ID FROM Location WHERE zipcode = '{zipcode}' AND country = '{country}';"
         with conn.cursor() as cursor:
             cursor.execute(query_string)
             row = cursor.fetchone()
             return row[0]
-
-    def Insert_TimeZone_Query(timezone_name):
-        query_string = f"INSERT INTO TimeZone (TimeZone_name) VALUES ('{timezone_name}');"
-        with conn.cursor() as cursor:
-            cursor.execute(query_string)
-
-    def Check_User_Query(user):
-        query_string = f"SELECT User_ID FROM Users WHERE User_ID = '{user}'"
-        with conn.cursor() as cursor:
-            cursor.execute(query_string)
-            row = cursor.fetchone()
-            return row
     
-    def Check_Song_Query(song):
-        query_string = f"SELECT Song_ID FROM Songs WHERE Song_ID = '{song}'"
-        with conn.cursor() as cursor:
-            cursor.execute(query_string)
-            row = cursor.fetchone()
-            return row
-    
-    def Get_UTC_Day_ID_Query(utc_day):
+    def Get_UTC_Day_ID(utc_day):
         query_string = f"SELECT UTC_Day_ID FROM UTC_Day WHERE UTC_Day = '{utc_day}'"
         with conn.cursor() as cursor:
             cursor.execute(query_string)
             row = cursor.fetchone()
             return row[0]
     
-    def Insert_UTC_Day_Query(utc_day):
-        query_string = f"INSERT INTO UTC_Day (UTC_Day) VALUES ('{utc_day}');"
-        with conn.cursor() as cursor:
-            cursor.execute(query_string)
-    
-    def Get_UTC_Hour_ID_Query(utc_hour):
+    def Get_UTC_Hour_ID(utc_hour):
         query_string = f"SELECT UTC_Hour_ID FROM UTC_Hour WHERE UTC_Hour = '{utc_hour}'"
         with conn.cursor() as cursor:
             cursor.execute(query_string)
             row = cursor.fetchone()
             return row[0]
     
-    def Insert_UTC_Hour_Query(utc_hour):
-        query_string = f"INSERT INTO UTC_Hour (UTC_Hour) VALUES ('{utc_hour}');"
-        with conn.cursor() as cursor:
-            cursor.execute(query_string)
-
-    def Insert_Genre_Query(genre):
-        query_string = f"INSERT INTO Genres (Genre) VALUES ('{genre}');"
-        with conn.cursor() as cursor:
-            cursor.execute(query_string)
-    
-    def Get_Genre_ID_Query(genre):
+    def Get_Genre_ID(genre):
         query_string = f"SELECT Genre_ID FROM Genres WHERE Genre = '{genre}'"
         with conn.cursor() as cursor:
             cursor.execute(query_string)
@@ -306,7 +283,52 @@ with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+da
             row = cursor.fetchone()
             return row[0]
     
-    def Insert_Weather_Info(weather_info):
+    def Insert_Location(location_info):
+        columns = ', '.join(location_info.keys())
+        placeholders = ', '.join('?' * len(location_info.keys()))
+        columns = columns.replace("'","")
+        values = [x for x in location_info.values()]
+        query_string = f"INSERT INTO Location ({columns}) VALUES ({placeholders});"
+        with conn.cursor() as cursor:
+            cursor.execute(query_string,values)
+    
+    def Insert_TimeZone(timezone_info):
+        columns = ', '.join(timezone_info.keys())
+        placeholders = ', '.join('?' * len(timezone_info.keys()))
+        columns = columns.replace("'","")
+        values = [x for x in timezone_info.values()]
+        query_string = f"INSERT INTO TimeZone ({columns}) VALUES ({placeholders});"
+        with conn.cursor() as cursor:
+            cursor.execute(query_string,values)
+    
+    def Insert_UTC_Day(utc_day_info):
+        columns = ', '.join(utc_day_info.keys())
+        placeholders = ', '.join('?' * len(utc_day_info.keys()))
+        columns = columns.replace("'","")
+        values = [x for x in utc_day_info.values()]
+        query_string = f"INSERT INTO UTC_Day ({columns}) VALUES ({placeholders});"
+        with conn.cursor() as cursor:
+            cursor.execute(query_string,values)
+    
+    def Insert_UTC_Hour(utc_hour_info):
+        columns = ', '.join(utc_hour_info.keys())
+        placeholders = ', '.join('?' * len(utc_hour_info.keys()))
+        columns = columns.replace("'","")
+        values = [x for x in utc_hour_info.values()]
+        query_string = f"INSERT INTO UTC_Hour ({columns}) VALUES ({placeholders});"
+        with conn.cursor() as cursor:
+            cursor.execute(query_string,values)
+
+    def Insert_Genre(genre_info):
+        columns = ', '.join(genre_info.keys())
+        placeholders = ', '.join('?' * len(genre_info.keys()))
+        columns = columns.replace("'","")
+        values = [x for x in genre_info.values()]
+        query_string = f"INSERT INTO Genres ({columns}) VALUES ({placeholders});"
+        with conn.cursor() as cursor:
+            cursor.execute(query_string,values)
+
+    def Insert_Weather(weather_info):
         columns = ', '.join(weather_info.keys())
         placeholders = ', '.join('?' * len(weather_info.keys()))
         columns = columns.replace("'","")
@@ -341,6 +363,15 @@ with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+da
         query_string = f"INSERT INTO Sun_Position ({columns}) VALUES ({placeholders});"
         with conn.cursor() as cursor:
             cursor.execute(query_string,values)
+    
+    def Insert_Location_UTC_Day_Hour(location_day_hour_info):
+        columns = ', '.join(location_day_hour_info.keys())
+        placeholders = ', '.join('?' * len(location_day_hour_info.keys()))
+        columns = columns.replace("'","")
+        values = [x for x in location_day_hour_info.values()]
+        query_string = f"INSERT INTO Location_UTC_Day_Hour ({columns}) VALUES ({placeholders});"
+        with conn.cursor() as cursor:
+            cursor.execute(query_string,values)
 
     def Insert_Time_Period(time_period_info):
         columns = ', '.join(time_period_info.keys())
@@ -368,17 +399,8 @@ with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+da
         query_string = f"INSERT INTO DataCollectedPerHour ({columns}) VALUES ({placeholders});"
         with conn.cursor() as cursor:
             cursor.execute(query_string,values)
-    
-    def Insert_Weather_Data(weather_info):
-        columns = ', '.join(weather_info.keys())
-        placeholders = ', '.join('?' * len(weather_info.keys()))
-        columns = columns.replace("'","")
-        values = [x for x in weather_info.values()]
-        query_string = f"INSERT INTO Weather_Characteristics ({columns}) VALUES ({placeholders});"
-        with conn.cursor() as cursor:
-            cursor.execute(query_string,values)
 
-    def Insert_User_Query(user_information):
+    def Insert_User(user_information):
         columns = ', '.join(user_information.keys())
         placeholders = ', '.join('?' * len(user_information.keys()))
         columns = columns.replace("'","")
@@ -387,16 +409,16 @@ with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+da
         with conn.cursor() as cursor:
             cursor.execute(query_string,values)
 
-    def Insert_Song_Query(song_information):
-        columns = ', '.join(song_information.keys())
-        placeholders = ', '.join('?' * len(song_information.keys()))
+    def Insert_Song(song_info):
+        columns = ', '.join(song_info.keys())
+        placeholders = ', '.join('?' * len(song_info.keys()))
         columns = columns.replace("'","")
-        values = [x for x in song_information.values()]
+        values = [x for x in song_info.values()]
         query_string = f"INSERT INTO Songs ({columns}) VALUES ({placeholders});"
         with conn.cursor() as cursor:
             cursor.execute(query_string,values)
 
-    def Insert_Song_Genre_Query(song_genre_info):
+    def Insert_Song_Genre(song_genre_info):
         columns = ', '.join(song_genre_info.keys())
         placeholders = ', '.join('?' * len(song_genre_info.keys()))
         columns = columns.replace("'","")
@@ -405,7 +427,7 @@ with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+da
         with conn.cursor() as cursor:
             cursor.execute(query_string,values)
 
-    def Insert_Song_Artist_Query(song_artist_info):
+    def Insert_Song_Artist(song_artist_info):
         columns = ', '.join(song_artist_info.keys())
         placeholders = ', '.join('?' * len(song_artist_info.keys()))
         columns = columns.replace("'","")
@@ -414,7 +436,7 @@ with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+da
         with conn.cursor() as cursor:
             cursor.execute(query_string,values)
 
-    def Insert_Songs_Playlist_Query(song_playlist_info):
+    def Insert_Songs_Playlist(song_playlist_info):
         columns = ', '.join(song_playlist_info.keys())
         placeholders = ', '.join('?' * len(song_playlist_info.keys()))
         columns = columns.replace("'","")
@@ -423,7 +445,7 @@ with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+da
         with conn.cursor() as cursor:
             cursor.execute(query_string,values)
 
-    def Insert_Artist_Query(artist_info):
+    def Insert_Artist(artist_info):
         columns = ', '.join(artist_info.keys())
         placeholders = ', '.join('?' * len(artist_info.keys()))
         columns = columns.replace("'","")
@@ -432,7 +454,7 @@ with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+da
         with conn.cursor() as cursor:
             cursor.execute(query_string,values)
 
-    def Insert_Genre_Artist_Query(genre_artist_info):
+    def Insert_Genre_Artist(genre_artist_info):
         columns = ', '.join(genre_artist_info.keys())
         placeholders = ', '.join('?' * len(genre_artist_info.keys()))
         columns = columns.replace("'","")
@@ -441,7 +463,7 @@ with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+da
         with conn.cursor() as cursor:
             cursor.execute(query_string,values)
 
-    def Insert_Playlist_Query(playlist_info):
+    def Insert_Playlist(playlist_info):
         columns = ', '.join(playlist_info.keys())
         placeholders = ', '.join('?' * len(playlist_info.keys()))
         columns = columns.replace("'","")
@@ -450,7 +472,7 @@ with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+da
         with conn.cursor() as cursor:
             cursor.execute(query_string,values)
 
-    def Insert_Genre_Playlist_Query(genre_playlist_info):
+    def Insert_Genre_Playlist(genre_playlist_info):
         columns = ', '.join(genre_playlist_info.keys())
         placeholders = ', '.join('?' * len(genre_playlist_info.keys()))
         columns = columns.replace("'","")
@@ -459,7 +481,7 @@ with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+da
         with conn.cursor() as cursor:
             cursor.execute(query_string,values)
     
-    def Insert_Recently_Played_Songs_User_Query(recently_played_info):
+    def Insert_Recently_Played_Songs_User(recently_played_info):
         columns = ', '.join(recently_played_info.keys())
         placeholders = ', '.join('?' * len(recently_played_info.keys()))
         columns = columns.replace("'","")
@@ -468,7 +490,7 @@ with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+da
         with conn.cursor() as cursor:
             cursor.execute(query_string,values)
 
-    def Insert_Users_Artists_Query(user_artist_info):
+    def Insert_Users_Artists(user_artist_info):
         columns = ', '.join(user_artist_info.keys())
         placeholders = ', '.join('?' * len(user_artist_info.keys()))
         columns = columns.replace("'","")
@@ -477,11 +499,20 @@ with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+da
         with conn.cursor() as cursor:
             cursor.execute(query_string,values)
 
-    def Insert_Users_Playlists_Query(user_playlist_info):
+    def Insert_Users_Playlists(user_playlist_info):
         columns = ', '.join(user_playlist_info.keys())
         placeholders = ', '.join('?' * len(user_playlist_info.keys()))
         columns = columns.replace("'","")
         values = [x for x in user_playlist_info.values()]
         query_string = f"INSERT INTO Users_Playlists ({columns}) VALUES ({placeholders});"
+        with conn.cursor() as cursor:
+            cursor.execute(query_string,values)
+
+    def Insert_User_Genres(user_genre_info):
+        columns = ', '.join(user_genre_info.keys())
+        placeholders = ', '.join('?' * len(user_genre_info.keys()))
+        columns = columns.replace("'","")
+        values = [x for x in user_genre_info.values()]
+        query_string = f"INSERT INTO Users_Genres ({columns}) VALUES ({placeholders});"
         with conn.cursor() as cursor:
             cursor.execute(query_string,values)

@@ -2,14 +2,29 @@ import requests
 import json
 from datetime import datetime
 
-# Get the Current User's Recently Played Tracks (50)
-RECENT_TRACKS_ENDPOINT = 'https://api.spotify.com/v1/me/player/recently-played?limit=50'
-PLAYLISTS_ENDPOINT =  'https://api.spotify.com/v1/me/playlists'
+'''
+All Used Endpoints:
+https://api.spotify.com/v1/audio-features
+https://api.spotify.com/v1/me/player/recently-played
+https://api.spotify.com/v1/me/playlists
+https://api.spotify.com/v1/playlists/{playlist['id']}/
+All Required Scopes:
+playlist-read-private
+user-read-recently-played
+'''
 
-# https://developer.spotify.com/web-api/web-api-personalization-endpoints/get-recently-played
-# Access Token requires scope: user-read-recently-played
+
+#TODO:Unit test this method:
 def get_recent_tracks(access_token,after=None,limit=None,id_only=False):
-    url = RECENT_TRACKS_ENDPOINT
+    '''
+    Access_token
+    After-A unix timestamp of the last date to get recently played tracks.
+    Limit-How many tracks we can have
+    id_only-If turned Will only return a dictionary  in ID:{Name: str, Finished_at:UTC_Time}
+    Required Scopes:user-read-recently-played
+    Endpoint:https://developer.spotify.com/documentation/web-api/reference/#endpoint-get-recently-played
+    '''
+    url = 'https://api.spotify.com/v1/me/player/recently-played?limit=50'
     if after is not None:
         url += ('&after=' + str(after))
     auth_header = {"Authorization": "Bearer {}".format(access_token)}
@@ -22,8 +37,14 @@ def get_recent_tracks(access_token,after=None,limit=None,id_only=False):
         return song_id
     return resp.json()
 
+#TODO: Unit test this method
 def get_current_user_playlists(access_token):
-    url = PLAYLISTS_ENDPOINT
+    '''
+    Access_token:
+    Required Scopes:playlist-read-private
+    Endpoint:https://developer.spotify.com/documentation/web-api/reference/#endpoint-get-a-list-of-current-users-playlists
+    '''
+    url = 'https://api.spotify.com/v1/me/playlists'
     auth_header = {"Authorization": "Bearer {}".format(access_token)}
     resp = requests.get(url, headers=auth_header)
     return resp.json()
@@ -46,8 +67,18 @@ def validate_month(date_text):
     except ValueError:
         return False
 
-def get_songs_audio_features(access_token,song_id,extra_info):
-    song_id_req = list(chunks(list(song_id),50)) # In case they have more than 50 songs which is likely we need to split requests up into batches of 50.
+#TODO: Unit test this method
+def get_songs_audio_features(access_token,songs_ids,extra_info):
+    '''
+    Extra_info a dictionary holding
+    popularity:int
+    release_year:int
+    is_explicit:bool
+    Song_name:str
+    Required Scopes:None
+    Endpoints Used:https://developer.spotify.com/documentation/web-api/reference/#endpoint-get-several-audio-features
+    '''
+    song_id_req = list(chunks(list(songs_ids),50)) # In case they have more than 50 songs which is likely we need to split requests up into batches of 50.
     audio_dict = dict()
     for req in song_id_req:
         id_str =  ",".join(req)
@@ -67,7 +98,8 @@ def get_songs_audio_features(access_token,song_id,extra_info):
                 temp_d[a['id']].pop('track_href', None)
                 temp_d[a['id']]['Song_name'] = extra_info[a['id']]['name']
                 temp_d[a['id']]['popularity'] = extra_info[a['id']]['popularity']
-                release_year = datetime.now().year
+                release_year = 2100 # In case we don't know the album year we'll just use this instead
+                # Spotify occasionally doesn't give us release_date in the traditional format so we have to check for that.
                 if validate_full(extra_info[a['id']]['release_date']):
                     release_year =  datetime.strptime(extra_info[a['id']]['release_date'],"%Y-%m-%d").year
                 elif validate_month(extra_info[a['id']]['release_date']):
@@ -82,10 +114,25 @@ def get_songs_audio_features(access_token,song_id,extra_info):
             print("ERR:" + str(err))
     return audio_dict
 
+#TODO : Unit test this method
+# Market Id is the country code given by spotify.
 def get_all_songs_table_info(access_token,market_id):
+    '''
+    Market_ID:Country Code
+    Access_token
+    Returns:
+    Gets table info for all song_related tables for a user except genre related ones.
+    Required Scopes: 
+    playlist-read-private
+    user-read-recently-played
+    Endpoints Used:
+    https://developer.spotify.com/documentation/web-api/reference/#endpoint-get-several-audio-features
+    https://developer.spotify.com/documentation/web-api/reference/#endpoint-get-playlists-tracks
+    https://developer.spotify.com/documentation/web-api/reference/#endpoint-get-a-list-of-current-users-playlists
+    '''
     songs_playlists = dict()
-    songs = set() # Avoid duplicates between songs
-    extra_info = dict()
+    songs = set() 
+    extra_info = dict() # The ML model also uses extra features such as release_year, popularity, and is_explicit to classify genres.
     artist_songs = dict()
     playlists = list()
     artists = set()
@@ -118,6 +165,8 @@ def get_all_songs_table_info(access_token,market_id):
                 }
         except requests.exceptions.HTTPError as err:
             print("ERR:" + str(err))
+
+    # Getting recently played songs info
     recently_played_songs = list()
     try:
         resp = get_recent_tracks(access_token)

@@ -19,6 +19,13 @@ except Exception:
     GEO_KEY = os.getenv('GEO_API_KEY')
     WEATHER_KEY = os.getenv('WEATHER_API_KEY')
 
+# Note from OpenWeather API:
+# If you do not see some of the parameters in your API response it means that these weather 
+# phenomena are just not happened for the time of measurement for the city or location chosen. 
+# Only really measured or calculated data is displayed in API response.
+
+#NOTE: We do not collect the latitude and longitude but sun_time has a get_long_lat method from the zipcode and country.
+
 # Return user's zip code
 def get_zip_code():
     CLIENT_IP = request.remote_addr
@@ -31,10 +38,6 @@ def get_zip_code():
         return '00000'
     return zipcode
 
-# Note from OpenWeather API:
-# If you do not see some of the parameters in your API response it means that these weather 
-# phenomena are just not happened for the time of measurement for the city or location chosen. 
-# Only really measured or calculated data is displayed in API response.
 def get_current_weather():
     weather_dict = {}
     try:
@@ -54,9 +57,14 @@ def get_current_weather():
         weather_dict = {"ERROR" : str(e)}
     return weather_dict
 
+'''
+Returns:
+For information on the full response:https://openweathermap.org/api/one-call-api
+'''
+#TODO: Unit test this method.
 def get_prev_day_data(lat,lng):
     try:
-        prev_day = datetime.utcnow() - timedelta(days = 1)
+        prev_day = datetime.utcnow() - timedelta(days=1)
         wr =  requests.get(f"http://api.openweathermap.org/data/2.5/onecall/timemachine?lat={lat}&lon={lng}&dt={int(prev_day.timestamp())}&appid={WEATHER_KEY}")
         wr.raise_for_status()
         return wr.json()['hourly']
@@ -64,10 +72,11 @@ def get_prev_day_data(lat,lng):
         print(f'ERROR:{str(e)}')
         return dict()
 
-# Note from OpenWeather API:
-# If you do not see some of the parameters in your API response it means that these weather 
-# phenomena are just not happened for the time of measurement for the city or location chosen. 
-# Only really measured or calculated data is displayed in API response.
+'''
+Returns:
+For information on the full response:https://openweathermap.org/current#geo
+'''
+#TODO:Unit test this method
 def get_weather_from_zipcode(zipcode,country_code):
     try:
         units_type = 'imperial'
@@ -76,7 +85,11 @@ def get_weather_from_zipcode(zipcode,country_code):
     except requests.exceptions.RequestException as e:  # This is the correct syntax
         print("ERR:" + str(err))
     return weatherdict
-
+'''
+Returns:
+For infomration on the full response:https://openweathermap.org/current#geo
+'''
+#TODO:Unit test this method
 def get_weather_from_latlong(latitude,longitude):
     try:
         units_type = 'imperial'
@@ -86,8 +99,16 @@ def get_weather_from_latlong(latitude,longitude):
         print("ERR:" + str(err))
     return weatherdict
 
-
-def get_historical_weather_latlong(latitude,longitude,date):#Date: Unix timestamp
+'''
+Params: 
+Date: A unix timestamp
+NOTE: it must be within 5 days of the current time
+Latitude,Longitude: 
+Returns:
+For infomration on the full response:https://openweathermap.org/api/one-call-api
+'''
+#TODO: Unit test this method.
+def get_historical_weather_latlong(latitude,longitude,date):
     try:
         units_type = 'imperial'
         wr = requests.get('https://api.openweathermap.org/data/2.5/onecall/timemachine?lat={lat}&lon={lon}&dt={time}&appid={key}&units={units}'.format(latitude,longitude,date,WEATHER_KEY,units_type))
@@ -173,5 +194,3 @@ def get_last_updated(data):
         return data['current']['lastupdate']['@value']
     except Exception:
         return -1
-
-get_prev_day_data(40.178098,-74.241539)

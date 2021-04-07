@@ -6,7 +6,6 @@ import pytz
 import os
 import requests
 from dotenv import load_dotenv
-from timezonefinder import TimezoneFinder
 
 GOOGLE_MAP_KEY = ''
 try:
@@ -15,7 +14,12 @@ except Exception:
     load_dotenv()
     GOOGLE_MAP_KEY = os.getenv('GOOGLE_MAP_KEY')
 
-
+'''
+Added Dependencies:
+Pytz,TimeZoneFinder,astral
+TODO: If we can let's attempt to see if we can find timezone and sunposition without these added dependencies.
+'''
+#TODO:Unit test this method
 def get_SunPosition(latitude, longitude, curr_time):
     tf = TimezoneFinder()
     utc = pytz.UTC
@@ -41,7 +45,7 @@ def get_SunPosition(latitude, longitude, curr_time):
     else:
         return "Dusk"
 
-
+#TODO:Unit test this method
 def getTimePeriod(latitude,longitude, curr_time):
     converted_time = getConvertedTime(curr_time,getTimeZone(latitude, longitude))
     if converted_time.hour == 12:
@@ -57,13 +61,13 @@ def getTimePeriod(latitude,longitude, curr_time):
     else:
         return "Night"
 
-
+#TODO:Unit test this method
 def get_long_lat(zipcode, country):
     maps_query = f'https://maps.google.com/maps/api/geocode/json?components=country:{country}|postal_code:{zipcode}&sensor=false&key={GOOGLE_MAP_KEY}'
     try:
         resp = requests.get(maps_query)
         resp.raise_for_status()
-        if resp.json()['status'] == 'ZERO_RESULTS':
+        if resp.json()['status'] == 'ZERO_RESULTS': # Google Maps can not decode private zipcodes+ country combinations.
             location = dict()
         else:
             location = resp.json()['results'][0]['geometry']['location']
