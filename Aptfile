@@ -1,4 +1,2 @@
-python-pyodbc
-unixodbc
-unixodbc-dev
-libsqliteodbc
+http://ftp.br.debian.org/debian/pool/main/p/pyodbc/python-pyodbc_3.0.10-2_amd64.deb
+http://ftp.br.debian.org/debian/pool/main/u/unixodbc/unixodbc-dev_2.3.4-1_amd64.deb
