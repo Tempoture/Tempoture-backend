@@ -20,7 +20,7 @@ scheduler = BackgroundScheduler()
 # if you don't wanna use a config, you can set options here:
 # scheduler.api_enabled = True
 scheduler.start()
-scheduler.add_job(func=task_app.store,trigger='interval',id='Store',seconds=10)
+scheduler.add_job(func=task_app.store,trigger='cron',id='Store',minute='0-59/15')
 
 
 #TODO: We need to add in a method that recollects the users data every week.
