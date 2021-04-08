@@ -18,7 +18,7 @@ import os
 app = Flask(__name__)
 CORS(app)
 curr_date = datetime.utcnow().strftime("%m/%d/%Y")
-REDIS_URL = os.environ.get('REDISTOGO_URL') or 'redis://'
+REDIS_URL = os.environ.get('REDIS_URL') or 'redis://'
 app.redis = Redis.from_url(REDIS_URL)
 app.task_queue = rq.Queue('microblog-tasks', connection=app.redis,default_timeout=3600)
 
