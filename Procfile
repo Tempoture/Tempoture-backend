@@ -1,2 +1,2 @@
 web: gunicorn app:app
-worker: python worker.py
+worker: rq worker -u $REDIS_URL microblog-tasks

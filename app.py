@@ -12,13 +12,15 @@ from datetime import datetime
 import time
 from redis import Redis
 import rq
-from worker import conn
 from taskrunner import background_task_app
 import os 
 
 app = Flask(__name__)
 CORS(app)
-q = rq.Queue(connection=conn)
+curr_date = datetime.utcnow().strftime("%m/%d/%Y")
+REDIS_URL = os.environ.get('REDIS_URL') or 'redis://'
+app.redis = Redis.from_url(REDIS_URL)
+app.task_queue = rq.Queue('microblog-tasks', connection=app.redis,default_timeout=3600)
 
 
 scheduler = BackgroundScheduler()
@@ -28,7 +30,7 @@ scheduler.start()
 scheduler.add_job(func=background_task_app.store_tracks,trigger='cron',id='Store',minute='0-59/15')
 
 def launch_task(name, description, **kwargs):
-    rq_job = q.enqueue('taskrunner.background_task_app.' + name,kwargs=kwargs)
+    rq_job = app.task_queue.enqueue('taskrunner.background_task_app.' + name,kwargs=kwargs)
     if 'user_id' in kwargs:
         spotify_database.Insert_Full_Task_Info(task_id = rq_job.get_id(),task_type = name,description = description,user_id=kwargs['user_id'])
     else:
