@@ -185,6 +185,10 @@ def Insert_Playlist_Genres_Info(utc_day_id,playlist_id,genres_playlists):
         }
         ml_database.Insert_Genre_Playlist(genre_playlist_table)
 
+def Insert_Full_Task_Info(task_id,task_type,description,user_id=None):
+    task_type_id = Insert_Task_Type_Info(task_type,description)
+    Insert_Task_Info(task_id,task_type_id,user_id)
+
 
 def Insert_Playlist_Info(playlist_name,playlist_id):
     playlist_table = {
@@ -356,3 +360,21 @@ def Insert_Data_Hour_Song_Info(track_id,data_hour_id,is_new):
         'isNew' : int(is_new)
     }
     ml_database.Insert_Data_Hour_Song(data_hour_songs_table)
+
+def Insert_Task_Info(task_id,task_type_id,user_id=None):
+    task_table = {
+        'User_ID' : user_id,
+        'Task_ID' : task_id,
+        'Task_Type_ID' : task_type_id,
+        'Complete' : 0
+    }
+    ml_database.Insert_Task(task_table)
+
+def Insert_Task_Type_Info(task_type,description):
+    task_type_table = {
+        'Task_Type' : task_type,
+        'description' : description
+    }
+    ml_database.Insert_Task_Type(task_type_table)
+    task_type_id = ml_database.Get_Task_Type_ID(task_type)
+    return task_type_id

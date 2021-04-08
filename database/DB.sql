@@ -251,6 +251,34 @@ CREATE TABLE Users_Genres(
     Confidence numeric(7,5) NOT NULL
     PRIMARY KEY (User_ID,Genre_ID,UTC_Day_ID) WITH (IGNORE_DUP_KEY = ON));
 
+CREATE TABLE Tasks(
+    User_ID varchar(100),
+    Task_ID varchar(36) NOT NULL,
+    Task_Type_ID int NOT NULL,
+    Complete bit NOT NULL,
+    PRIMARY KEY(Task_ID));
+
+CREATE TABLE Task_Type(
+    Task_Type_ID smallint NOT NULL IDENTITY,
+    Task_Type varchar(100) NOT NULL,
+    description text NOT NULL,
+    PRIMARY KEY (Task_Type_ID) WITH (IGNORE_DUP_KEY = ON));
+
+CREATE UNIQUE NONCLUSTERED INDEX IX_Task_Type   
+   ON Task_Type (Task_Type) WITH (IGNORE_DUP_KEY = ON); 
+
+
+ALTER TABLE Tasks 
+    ADD FOREIGN KEY (User_ID)
+    REFERENCES Users (User_ID);
+
+
+
+ALTER TABLE Tasks
+    ADD FOREIGN KEY (Task_Type_ID)
+    REFERENCES Task_Type (Task_Type_ID);
+
+
 
 ALTER TABLE Location_UTC_Day_Hour
     ADD FOREIGN KEY (UTC_Day_ID)

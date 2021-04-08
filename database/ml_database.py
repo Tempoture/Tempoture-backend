@@ -43,6 +43,12 @@ with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+da
         with conn.cursor() as cursor:
             cursor.execute(query_string)
     
+    def Update_User_Num_Songs(numSongs,User_ID):
+        query_string = f"UPDATE Users SET numSongs = {numSongs} WHERE User_ID = '{User_ID}'; "
+        with conn.cursor() as cursor:
+            cursor.execute(query_string)
+
+    
     def Update_Access_information(User_ID,access_token,last_refreshed):
         query_string =  f"UPDATE Users SET access_token = '{access_token}',last_refreshed = {last_refreshed} WHERE User_ID = '{User_ID}'; "
         with conn.cursor() as cursor:
@@ -56,6 +62,11 @@ with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+da
     
     def Set0_NumHours(User_ID):
         query_string =  f"UPDATE Users SET numHours= 0 WHERE User_ID = '{User_ID}'; "
+        with conn.cursor() as cursor:
+            cursor.execute(query_string)
+    
+    def Complete_Task(Task_ID):
+        query_string = f"UPDATE Tasks SET Complete = 1 WHERE Task_ID = '{Task_ID}';"
         with conn.cursor() as cursor:
             cursor.execute(query_string)
     
@@ -282,7 +293,32 @@ with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+da
             cursor.execute(query_string)
             row = cursor.fetchone()
             return row[0]
+
+    def Get_Task_Type_ID(task_type):
+        query_string = f"SELECT Task_Type_ID FROM Task_Type WHERE Task_Type = '{task_type}' "
+        with conn.cursor() as cursor:
+            cursor.execute(query_string)
+            row = cursor.fetchone()
+            return row[0]
     
+    def Insert_Task(task_info):
+        columns = ', '.join(task_info.keys())
+        placeholders = ', '.join('?' * len(task_info.keys()))
+        columns = columns.replace("'","")
+        values = [x for x in task_info.values()]
+        query_string = f"INSERT INTO Tasks ({columns}) VALUES ({placeholders});"
+        with conn.cursor() as cursor:
+            cursor.execute(query_string,values)
+    
+    def Insert_Task_Type(task_type_info):
+        columns = ', '.join(task_type_info.keys())
+        placeholders = ', '.join('?' * len(task_type_info.keys()))
+        columns = columns.replace("'","")
+        values = [x for x in task_type_info.values()]
+        query_string = f"INSERT INTO Task_Type ({columns}) VALUES ({placeholders});"
+        with conn.cursor() as cursor:
+            cursor.execute(query_string,values)
+            
     def Insert_Location(location_info):
         columns = ', '.join(location_info.keys())
         placeholders = ', '.join('?' * len(location_info.keys()))

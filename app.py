@@ -10,19 +10,35 @@ from database import ml_database,spotify_database
 import requests
 from datetime import datetime
 import time
-from taskrunner import refresh_token,task_app
+from redis import Redis
+import rq
+from taskrunner import refresh_token,background_task_app
+import os 
 
 app = Flask(__name__)
 CORS(app)
 curr_date = datetime.utcnow().strftime("%m/%d/%Y")
 
+
+app.redis = Redis.from_url(os.environ.get('REDIS_URL') or 'redis://')
+app.task_queue = rq.Queue('microblog-tasks', connection=app.redis,default_timeout=3600)
+
+
 scheduler = BackgroundScheduler()
 # if you don't wanna use a config, you can set options here:
 # scheduler.api_enabled = True
 scheduler.start()
-scheduler.add_job(func=task_app.store,trigger='cron',id='Store',minute='0-59/15')
+scheduler.add_job(func=background_task_app.store,trigger='cron',id='Store',minute='0-59/15')
 
 
+def launch_task(name, description, **kwargs):
+    rq_job = app.task_queue.enqueue('taskrunner.background_task_app.' + name,kwargs=kwargs)
+    if 'user_id' in kwargs:
+        spotify_database.Insert_Full_Task_Info(task_id = rq_job.get_id(),task_type = name,description = description,user_id=kwargs['user_id'])
+    else:
+        spotify_database.Insert_Full_Task_Info(task_id = rq_job.get_id(),task_type = name,description = description)
+    return rq_job
+    
 #TODO: We need to add in a method that recollects the users data every week.
 
 
@@ -53,33 +69,11 @@ def store_user():
         status = 200
         success = True
         if query is None:
-            print(country)
-            spotify_info = spotify.get_all_songs_table_info(access_token,country)
-
-            utc_day = datetime.utcnow().strftime("%m/%d/%Y")
-            utc_day_id = spotify_database.Insert_UTC_Day_Info(utc_day)
-
             location_id = spotify_database.Insert_Location_Info(zipcode,country)
+            spotify_database.Insert_User_Info(user_id,access_token,refresh_token,last_refresh,name,location_id,-1)
 
-            songs = spotify_info['Songs']
-            spotify_database.Insert_Songs_Info(songs)
-
-            spotify_database.Insert_User_Info(user_id,access_token,refresh_token,last_refresh,name,location_id,len(songs))
-
-            user_genres = genre_ml_classifier.get_user_genre(songs)
-            spotify_database.Insert_User_Genres_Info(user_id,user_genres,utc_day_id)
-
-            recently_played_songs = spotify_info['Recently_Played_Songs']
-            spotify_database.Insert_User_Recently_Played_Songs_Info(utc_day_id,user_id,recently_played_songs)
-
-            artists = spotify_info['Artists']
-            songs_artists = spotify_info['Songs_Artists']
-            spotify_database.Insert_All_User_Artists_Info(utc_day_id,artists,songs_artists,user_id)
-
-            playlists = spotify_info['Playlists']
-            songs_playlists = spotify_info['Songs_Playlists']
-            spotify_database.Insert_All_User_Playlists_Info(playlists,user_id,utc_day_id,songs_playlists)
-
+            launch_task(name='store_user_info',description='Storing Spotify and location info for user.',user_id = user_id, \
+            access_token = access_token, country = country)
             message = "User inserted"
         else:
             message = "User already inserted"
