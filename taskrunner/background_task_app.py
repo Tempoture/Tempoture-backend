@@ -27,12 +27,13 @@ def store_user_info(user_id,access_token,country):
     job = get_current_job()
 
     spotify_info = spotify.get_all_songs_table_info(access_token,country)
-
+    print("SONGS RECEIVED")
     utc_day = datetime.utcnow().strftime("%m/%d/%Y")
     utc_day_id = spotify_database.Insert_UTC_Day_Info(utc_day)
 
     songs = spotify_info['Songs']
     spotify_database.Insert_Songs_Info(songs)
+    print("SONGS STORED")
 
     ml_database.Update_User_Num_Songs(len(songs),user_id)
 
@@ -50,3 +51,4 @@ def store_user_info(user_id,access_token,country):
     spotify_database.Insert_All_User_Playlists_Info(playlists,user_id,utc_day_id,songs_playlists)
     
     ml_database.Complete_Task(job.get_id())
+    print("Completed")
