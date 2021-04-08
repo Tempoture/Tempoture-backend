@@ -60,6 +60,16 @@ with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+da
         with conn.cursor() as cursor:
             cursor.execute(query_string)
     
+    def Update_User_Curr_Data_Date_ID(UTC_Day_ID,User_ID):
+        query_string = f"UPDATE Users SET Curr_Data_Date_ID = {UTC_Day_ID} WHERE User_ID = '{User_ID}'; "
+        with conn.cursor() as cursor:
+            cursor.execute(query_string)
+    
+    def Update_User_Curr_Data_Hour_ID(UTC_Hour_ID,User_ID):
+        query_string = f"UPDATE Users SET Curr_Data_Hour_ID = {UTC_Hour_ID} WHERE User_ID = '{User_ID}'; "
+        with conn.cursor() as cursor:
+            cursor.execute(query_string)
+    
     def Set0_NumHours(User_ID):
         query_string =  f"UPDATE Users SET numHours= 0 WHERE User_ID = '{User_ID}'; "
         with conn.cursor() as cursor:
@@ -95,13 +105,6 @@ with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+da
     
     def Check_Song(song):
         query_string = f"SELECT Song_ID FROM Songs WHERE Song_ID = '{song}'"
-        with conn.cursor() as cursor:
-            cursor.execute(query_string)
-            row = cursor.fetchone()
-            return row
-    
-    def Check_DataCollectedPerHour(User_ID,date,hour):
-        query_string = f"SELECT *  FROM DataCollectedPerHour A inner join UTC_Day B on A.UTC_Day_ID = B.UTC_Day_ID inner join UTC_Hour C on A.UTC_Hour_ID = C.UTC_Hour_ID WHERE C.UTC_Hour = '{hour}' AND B.UTC_Day = '{date}' AND A.User_ID = '{User_ID}'"
         with conn.cursor() as cursor:
             cursor.execute(query_string)
             row = cursor.fetchone()
@@ -163,6 +166,20 @@ with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+da
             row = cursor.fetchone()
             return row[0]
     
+    def Get_User_Curr_Data_Hour_ID(User_ID):
+        query_string = f"SELECT Curr_Data_Hour_ID FROM Users WHERE User_ID='{User_ID}';"
+        with conn.cursor() as cursor:
+            cursor.execute(query_string)
+            row = cursor.fetchone()
+            return row[0]
+    
+    def Get_User_Curr_Data_Date_ID(User_ID):
+        query_string = f"SELECT Curr_Data_Date_ID FROM Users WHERE User_ID='{User_ID}';"
+        with conn.cursor() as cursor:
+            cursor.execute(query_string)
+            row = cursor.fetchone()
+            return row[0]
+    
     def Get_Access_Information(User_ID):
         query_string = f"SELECT access_token,refresh_token,last_refreshed FROM Users WHERE User_ID='{User_ID}';"
         with conn.cursor() as cursor:
@@ -176,7 +193,7 @@ with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+da
             return access_info
     
     def Get_Day_Locations(UTC_Day_ID):
-        query_string = f"SELECT DISTINCT Location_ID FROM DataCollectedPerHour WHERE UTC_DAY_ID = {UTC_Day_ID}"
+        query_string = f"SELECT DISTINCT Location_ID FROM DataCollectedPerHour WHERE UTC_Day_ID = {UTC_Day_ID}"
         with conn.cursor() as cursor:
             cursor.execute(query_string)
             locations = [row[0] for row in cursor.fetchall()]

@@ -92,14 +92,13 @@ def Insert_Time_Data_Info(zipcode,country,location_id,utc_day_id,utc_hour_id):
 
     Insert_Location_UTC_Day_Hour_Info(location_id,utc_day_id,utc_hour_id,sun_position_id)
 
-def Insert_User_Recent_Songs(recent_tracks,user_id,curr_date):
+def Insert_User_Recent_Songs(recent_tracks,user_id,curr_date_id,curr_hour_id):
     '''
     Insert recently listened songs into data_hour_songs table or increments the number of times it was played.
     '''
     for (track_id,track) in recent_tracks.items():
         is_new = ml_database.Check_User_Playlist_Songs(user_id,track_id) is None and ml_database.Check_User_Recent_Songs(user_id,track_id) is None
-        curr_hour = datetime.utcnow().strftime("%H:00")
-        data_hour_id = ml_database.Get_User_Hour_Data_ID(user_id,curr_hour,curr_date)
+        data_hour_id = ml_database.Get_User_Hour_Data_ID(user_id,curr_hour_id,curr_date_id)
         if ml_database.Check_Data_Hour_Songs(user_id,track_id,data_hour_id) is not None:
             ml_database.Increment_Data_Hour_Song_Played(data_hour_id,track_id)
         else:

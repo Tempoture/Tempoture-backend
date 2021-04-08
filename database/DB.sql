@@ -19,6 +19,8 @@ CREATE TABLE Users(
     refresh_token text NOT NULL,
     last_refreshed bigint NOT NULL,
     User_ID varchar(100) NOT NULL,
+    Curr_Data_Date_ID int,
+    Curr_Data_Hour_ID int,
     PRIMARY KEY (User_ID) WITH (IGNORE_DUP_KEY = ON));
 
 CREATE TABLE Songs_Artists(
@@ -150,7 +152,7 @@ CREATE TABLE Location_UTC_Day_Hour(
     UTC_Day_ID int NOT NULL,
     UTC_Hour_ID int NOT NULL,
     Sun_Position_ID smallint NOT NULL,
-    PRIMARY KEY (Location_ID,UTC_Day_ID,UTC_Hour_ID));
+    PRIMARY KEY (Location_ID,UTC_Day_ID,UTC_Hour_ID) WITH (IGNORE_DUP_KEY = ON));
 
 CREATE TABLE Sun_Position(
     Sun_Position varchar(20) NOT NULL,
@@ -254,7 +256,7 @@ CREATE TABLE Users_Genres(
 CREATE TABLE Tasks(
     User_ID varchar(100),
     Task_ID varchar(36) NOT NULL,
-    Task_Type_ID int NOT NULL,
+    Task_Type_ID smallint NOT NULL,
     Complete bit NOT NULL,
     PRIMARY KEY(Task_ID));
 
@@ -370,7 +372,19 @@ ALTER TABLE Users
 ALTER TABLE Users
     ADD FOREIGN KEY (Home_Location_ID)
     REFERENCES Location (Location_ID);
-    
+
+
+
+ALTER TABLE Users
+    ADD FOREIGN KEY (Curr_Data_Date_ID)
+    REFERENCES UTC_Day (UTC_Day_ID);
+
+
+
+ALTER TABLE Users
+    ADD FOREIGN KEY (Curr_Data_Hour_ID)
+    REFERENCES UTC_Hour (UTC_Hour_ID);
+
 
 
 ALTER TABLE Location
