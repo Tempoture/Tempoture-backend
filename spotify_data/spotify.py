@@ -49,6 +49,8 @@ def get_current_user_playlists(access_token):
     resp = requests.get(url, headers=auth_header)
     return resp.json()
 
+
+
 def chunks(lst, n): # We have to split our playlist requests in chunks of 50
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
@@ -114,6 +116,34 @@ def get_songs_audio_features(access_token,songs_ids,extra_info):
             print("ERR:" + str(err))
     return audio_dict
 
+def get_song_analysis(access_token,song_id,market_id):
+    '''
+    Given a user's access token and market id , get's song features for data collection.
+    '''
+    req_endpoint = f'https://api.spotify.com/v1/tracks/{song_id}'
+    auth_header = {"Authorization": "Bearer {}".format(access_token)}
+    resp =requests.get(req_endpoint, headers=auth_header)
+    resp.raise_for_status()
+    track = resp.json()
+    extra_info = dict()
+    artists = set()
+    artist_songs = dict()
+    for artist in track['artists']:
+        artists.add((artist['id'],artist['name']))
+        artist_songs[artist['id']] = list()                        
+        artist_songs[artist['id']].append(track['id'])
+    extra_info[song_id] = {
+                    'name' : track['name'],
+                    'is_explicit' : track['explicit'],
+                    'popularity' : track['popularity'],
+                    'release_date' : track['album']['release_date']
+                }
+    songs_features = get_songs_audio_features(access_token,[song_id],extra_info)
+    
+    return songs_features
+
+# print(get_song_analysis('BQBq48m0tqarBE2xqe86T_drXq6C3yR-m0vUGvYlgmn0em-Vr8CWYZLG0sSvS6oYL5JS_6fz1TJ0Iyu8cjGKf5aBJ8vYs4PQuNfCpJETWj5bfoZAN9PR7Vw-OlURh88qisG4use4NQeb4AfZfJ2ai38vGuMHrMYqJLXKMVMsk9k4luv81o65ASli5bGdK2jSXMPCzGQuKqGQujhCs76rKzZ9jDQs','18c1fBSVo077DkZMBJJv8v','US'))
+
 #TODO : Unit test this method
 # Market Id is the country code given by spotify.
 def get_all_songs_table_info(access_token,market_id):
@@ -148,6 +178,7 @@ def get_all_songs_table_info(access_token,market_id):
             resp =requests.get(req_endpoint, headers=auth_header)
             resp.raise_for_status()
             for track in resp.json()['items']:
+                print(track)
                 songs.add(track['track']['id'])
                 for artist in track['track']['artists']:
                     artists.add((artist['id'],artist['name']))
