@@ -178,7 +178,7 @@ def get_all_songs_table_info(access_token,market_id):
             resp =requests.get(req_endpoint, headers=auth_header)
             resp.raise_for_status()
             for track in resp.json()['items']:
-                if track: # For Illegal tracks
+                if track['track']: # For Illegal tracks
                     songs.add(track['track']['id'])
                     for artist in track['track']['artists']:
                         artists.add((artist['id'],artist['name']))
@@ -202,20 +202,21 @@ def get_all_songs_table_info(access_token,market_id):
     try:
         resp = get_recent_tracks(access_token)
         for track in resp["items"]:
-            songs.add(track['track']['id'])
-            if track['track']['id'] not in songs_playlists:
-                for artist in track['track']['artists']:
-                    artists.add((artist['id'],artist['name']))
-                    if artist['id'] not in artist_songs:
-                        artist_songs[artist['id']] = list()                        
-                    artist_songs[artist['id']].append(track['track']['id'])
-                recently_played_songs.append(track['track']['id'])
-                extra_info[track['track']['id']] = {
-                    'name' : track['track']['name'],
-                    'is_explicit' : track['track']['explicit'],
-                    'popularity' : track['track']['popularity'],
-                    'release_date' : track['track']['album']['release_date']
-                }
+            if track['track']: # For Illegal tracks
+                songs.add(track['track']['id'])
+                if track['track']['id'] not in songs_playlists:
+                    for artist in track['track']['artists']:
+                        artists.add((artist['id'],artist['name']))
+                        if artist['id'] not in artist_songs:
+                            artist_songs[artist['id']] = list()                        
+                        artist_songs[artist['id']].append(track['track']['id'])
+                    recently_played_songs.append(track['track']['id'])
+                    extra_info[track['track']['id']] = {
+                        'name' : track['track']['name'],
+                        'is_explicit' : track['track']['explicit'],
+                        'popularity' : track['track']['popularity'],
+                        'release_date' : track['track']['album']['release_date']
+                    }
     except requests.exceptions.HTTPError as err:
         print("ERR:" + str(err))
     songs_features = get_songs_audio_features(access_token,songs,extra_info)
