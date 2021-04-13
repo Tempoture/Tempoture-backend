@@ -8,7 +8,7 @@ import base64
 RECENT_TRACKS_ENDPOINT = 'https://api.spotify.com/v1/me/player/recently-played?limit=5'
 PLAYLISTS_ENDPOINT =  'https://api.spotify.com/v1/me/playlists'
 CREATE_PLAYLISTS_ENDPOINT = 'https://api.spotify.com/v1/users/{}/playlists'
-ADD_TRACKS_PLAYLISTS_ENDPOINT = 'https://api.spotify.com/v1/playlists/{}/tracks'
+MODIFY_TRACKS_PLAYLISTS_ENDPOINT = 'https://api.spotify.com/v1/playlists/{}/tracks'
 CHANGE_PLAYLIST_COVER_ENDPOINT = 'https://api.spotify.com/v1/playlists/{}/images'
 DEFAULT_PLAYLIST_COVER = 'logo.jpeg'
 DEFAULT_PLAYLIST_NAME = 'Your Tempoture Playlist'
@@ -113,17 +113,40 @@ class SpotifyClient:
     def add_playlist_tracks(self, playlist_id, track_uri_data):
         """
         Input:
-        :param playlist_id (int): Spotify playlist id
+        :param playlist_id (int): id of Spotify playlist being modified
         :param track_uri_data (list): a list of Spotify track URI's , ex. ['spotify:track:xxxxxx', 'spotify:track:yyyyyyy']
     
-        @todo: 
         Output: 
-        a bool which determines if cover change went through successfully
+        snapshot_id = updated snapshot_id of the modified playlist (-1 if error occurred)
     
         """
         data = json.dumps(track_uri_data)
-        url = ADD_TRACKS_PLAYLISTS_ENDPOINT.format(playlist_id)
+        url = MODIFY_TRACKS_PLAYLISTS_ENDPOINT.format(playlist_id)
         response = self.post_api_request(url, data)
+        resp_json = response.json()
+        snapshot_id = -1
+        try:
+            snapshot_id = resp_json["snapshot_id"]
+        except Exception:
+            print("Status " + str(resp_json["error"]["status"]) + ": " + resp_json["error"]["message"])
+
+        return snapshot_id
+
+    def remove_playlist_tracks(self, playlist_id, track_uri_data, snapshot_id):
+        """
+        Input:
+        :param playlist_id (int): id of Spotify playlist being modified
+        :param track_uri_data (list): a list of Spotify track URIs to remove. Formatted ex: { "tracks": [{ "uri": "spotify:track:4iV5W9uYEdYUVa79Axb7Rh" },{ "uri": "spotify:track:1301WleyT98MSxVHPZCA6M" }] }
+        :param snapshot_id (int): (optional) playlist’s snapshot ID against which you want to make the changes
+
+        @todo: 
+        Output: 
+        snapshot_id = updated snapshot_id of the modified playlist (-1 if error occurred)
+    
+        """
+        data = json.dumps(track_uri_data)
+        url = MODIFY_TRACKS_PLAYLISTS_ENDPOINT.format(playlist_id)
+        response = self.delete_api_request(url, data)
         resp_json = response.json()
         snapshot_id = -1
         try:
@@ -155,6 +178,16 @@ class SpotifyClient:
         )
         return response
 
+    def delete_api_request(self, url, data):
+        response = requests.delete(
+            url,
+            data=data,
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {self.access_token}"
+            }
+        )
+        return response
 
     # Create a new demo playlist and populate with your 5 most recent songs 
     def test_create_and_populate(self, name=None, desc=None):
@@ -169,7 +202,7 @@ class SpotifyClient:
 
         playlist_id = self.create_playlist(name, desc)
         self.change_playlist_cover(playlist_id)
-        url = ADD_TRACKS_PLAYLISTS_ENDPOINT.format(playlist_id)
+        url = MODIFY_TRACKS_PLAYLISTS_ENDPOINT.format(playlist_id)
         track_uri_data =  self.get_recent_tracks()
         data = json.dumps(track_uri_data)
         response = self.post_api_request(url, data)
