@@ -59,7 +59,14 @@ Before installing the following softwares, have the latest version of Python ins
    
    `$sudo apt update` - Ensures Ubuntu is up to date.
    <br>`$pip3 install -r requirements.txt` - Installs all requirements from the requirements text file. Make sure you've navigated to the correct folder!
-    
+## Azure Cloud Design 
+
+<br />
+  <p align="center">
+    <img src="https://github.com/Tempoture/Tempoture-backend/blob/main/Azure%20Diagram.vpd%20(1).jpg" alt="Azure" width="800" height="400">
+  </p>
+<br />
+
 # Database
 <!-- ABOUT THE Database -->
 ## About The Database
