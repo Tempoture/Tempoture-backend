@@ -66,7 +66,7 @@ Before installing the following softwares, have the latest version of Python ins
 
 <br />
   <p align="center">
-    <img src="https://github.com/Tempoture/Tempoture-Data-Base/blob/main/Tempoture-MLDiagramV4.png?raw=true" alt="Database" width="800" height="400">
+    <img src="https://github.com/Tempoture/Tempoture-backend/blob/main/Tempoture-MLDiagramV4.png?raw=true" alt="Database" width="800" height="400">
   </p>
 <br />
 
