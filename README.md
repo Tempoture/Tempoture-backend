@@ -66,7 +66,7 @@ Before installing the following softwares, have the latest version of Python ins
 
 <br />
   <p align="center">
-    <img src="https://cdn.discordapp.com/attachments/750506956539822120/775842802964627486/schema.PNG" alt="Logo" width="800" height="400">
+    <img src="https://discord.com/channels/764881836491931659/802187212299960380/836624359341817886" alt="Logo" width="800" height="400">
   </p>
 <br />
 
