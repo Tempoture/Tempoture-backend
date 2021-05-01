@@ -2,8 +2,12 @@ import requests
 import json
 import base64
 
-# GOAL: Create a cleaner SpotifyClient class to call from main app
-
+"""
+@todo:
+Merge this class with merge spotify.py
+Some functions are in both, but the important functions in this file pertain
+to creating and modifying Spotify playlists for a user
+"""
 
 RECENT_TRACKS_ENDPOINT = 'https://api.spotify.com/v1/me/player/recently-played?limit=5'
 PLAYLISTS_ENDPOINT =  'https://api.spotify.com/v1/me/playlists'
