@@ -10,7 +10,7 @@ PLAYLISTS_ENDPOINT =  'https://api.spotify.com/v1/me/playlists'
 CREATE_PLAYLISTS_ENDPOINT = 'https://api.spotify.com/v1/users/{}/playlists'
 MODIFY_TRACKS_PLAYLISTS_ENDPOINT = 'https://api.spotify.com/v1/playlists/{}/tracks'
 CHANGE_PLAYLIST_COVER_ENDPOINT = 'https://api.spotify.com/v1/playlists/{}/images'
-DEFAULT_PLAYLIST_COVER = 'logo.jpeg'
+DEFAULT_PLAYLIST_COVER = 'tempoture-logo.jpeg'
 DEFAULT_PLAYLIST_NAME = 'Your Tempoture Playlist'
 DEFAULT_PLAYLIST_DESC = 'A custom-made playlist made by Tempoture for you!'
 
